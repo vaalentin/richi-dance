@@ -3,6 +3,7 @@ import * as TransformControls from 'three-transformcontrols'
 import * as OrbitControls from 'three-orbitcontrols'
 
 export default class Scene {
+import * as Keys from '../Keys'
   private _$element: HTMLElement
 
   private _scene: THREE.Scene
@@ -72,40 +73,38 @@ export default class Scene {
 
   private _handleKeyDown({ keyCode }: KeyboardEvent) {
     switch (keyCode) {
-      case 81: // Q
+      case Keys.Q:
         this._transformControls.setSpace(this._transformControls.space === 'local' ? 'world' : 'local')
 
         break
 
-      case 16: // Shift
+      case Keys.SHIFT:
         this._transformControls.setTranslationSnap(0.5)
         this._transformControls.setRotationSnap(THREE.Math.degToRad(15))
 
         break
 
-      case 87: // W
+      case Keys.W:
         this._transformControls.setMode('translate')
 
         break
 
-      case 69: // E
+      case Keys.E:
         this._transformControls.setMode('rotate')
 
         break
 
-      case 82: // R
+      case Keys.R:
         this._transformControls.setMode('scale')
 
         break
 
-      case 187:
-      case 107: // +, =, num+
+      case Keys.ADD:
         this._transformControls.setSize(this._transformControls.size + 0.1)
 
         break
 
-      case 189:
-      case 109: // -, _, num-
+      case Keys.SUBSTRACT:
         this._transformControls.setSize(Math.max(this._transformControls.size - 0.1, 0.1))
 
         break
@@ -114,7 +113,7 @@ export default class Scene {
 
   private _handleKeyUp({ keyCode }: KeyboardEvent) {
     switch (keyCode) {
-      case 16: // Ctrl
+      case Keys.SHIFT:
         this._transformControls.setTranslationSnap(null)
         this._transformControls.setRotationSnap(null)
 

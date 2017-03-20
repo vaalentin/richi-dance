@@ -2,6 +2,7 @@ import * as THREE from 'three'
 
 import Sequence from './Sequence'
 import { mapValueToRange } from '../math'
+import * as Keys from '../Keys'
 
 export default class Timeline {
   private _$element: HTMLElement
@@ -118,7 +119,7 @@ export default class Timeline {
 
   private _handleKeyDown({ keyCode }: KeyboardEvent) {
     switch (keyCode) {
-      case 32: // space
+      case Keys.SPACE: // space
         if (this._isPlaying) {
           this.pause()	
         }
