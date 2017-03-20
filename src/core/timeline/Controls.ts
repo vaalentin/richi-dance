@@ -158,8 +158,13 @@ export default class Controls extends EventDispatcher {
   }
 
   private _handleBoundariesChange() {
-    const from = parseFloat(this._$fromInput.value)
+    let from = parseFloat(this._$fromInput.value)
     let to = parseFloat(this._$toInput.value)
+
+    if (from < 0) {
+      from = 0
+      this._$fromInput.value = from.toString()
+    }
 
     if (to <= from) {
       to = from + 1
