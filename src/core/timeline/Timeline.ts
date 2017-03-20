@@ -153,7 +153,7 @@ export default class Timeline {
       return
     }
     
-    const time = this._progress * (this._boundaries[1] - this._boundaries[0])
+    const time = (this._progress * (this._boundaries[1] - this._boundaries[0])) + this._boundaries[0]
     
     this._sequence.setTime(time)
   }
