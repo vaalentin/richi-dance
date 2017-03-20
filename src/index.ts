@@ -1,5 +1,8 @@
 import * as THREE from 'three'
 
+import 'normalize.css'
+import './index.css'
+
 import Scene from './core/webgl/Scene'
 import KeyFrame from './core/timeline/KeyFrame'
 import Sequence from './core/timeline/Sequence'
