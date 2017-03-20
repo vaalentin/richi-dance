@@ -11,6 +11,7 @@ export default class Timeline {
 
   private _boundaries: [number, number]
   private _progress: number
+  private _speed: number
 
   private _isPlaying: boolean
   private _isMouseDown: boolean
@@ -32,6 +33,7 @@ export default class Timeline {
 
     this._boundaries = [0, 0]
     this._progress = 0
+    this._speed = 1
 
     this._isPlaying = false
     this._isMouseDown = false
@@ -131,7 +133,7 @@ export default class Timeline {
     
     const delta = this._clock.getDelta()
     
-    const progressDelta = (delta * 1) / (this._boundaries[1] - this._boundaries[0])
+    const progressDelta = (delta / (this._boundaries[1] - this._boundaries[0])) * this._speed
     
     this._progress += progressDelta
     
@@ -212,6 +214,10 @@ export default class Timeline {
     this._boundaries[1] = to
     
     this._render()
+  }
+
+  public setSpeed(speed: number) {
+    this._speed = speed
   }
 
   public setSequence(sequence: Sequence) {
