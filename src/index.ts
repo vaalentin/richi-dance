@@ -18,28 +18,28 @@ const camera = new THREE.PerspectiveCamera(45, width / height, 1, 100)
 camera.position.z = 5
 
 const cube = new THREE.Mesh(
-	new THREE.BoxGeometry(1, 1, 1),
-	new THREE.MeshBasicMaterial({
-		wireframe: true
-	})
+  new THREE.BoxGeometry(1, 1, 1),
+  new THREE.MeshBasicMaterial({
+    wireframe: true
+  })
 )
 
 scene.add(cube)
 
 function tick() {
-	window.requestAnimationFrame(tick)
-	
-	renderer.render(scene, camera)
+  window.requestAnimationFrame(tick)
+  
+  renderer.render(scene, camera)
 }
 
 tick()
 
 window.addEventListener('resize', () => {
-	const { innerWidth: width, innerHeight: height } = window
-	
-	renderer.setSize(width, height)
-	camera.aspect = width / height
-	camera.updateProjectionMatrix()
+  const { innerWidth: width, innerHeight: height } = window
+  
+  renderer.setSize(width, height)
+  camera.aspect = width / height
+  camera.updateProjectionMatrix()
 })
 
 const timeline = new Timeline($timeline)
@@ -49,26 +49,26 @@ const sequence = new Sequence(cube)
 timeline.setSequence(sequence)
 
 for (let i = 0; i < 11; ++i) {
-	const time = i
-	
-	const position = new THREE.Vector3(
-		(Math.random() * 2 - 1) * 2,
-		(Math.random() * 2 - 1) * 2,
-		(Math.random() * 2 - 1) * 2
-	)
-	
-	const rotation = new THREE.Euler(
-		(Math.random() * 2 - 1) * 2 * Math.PI,
-		(Math.random() * 2 - 1) * 2 * Math.PI,
-		(Math.random() * 2 - 1) * 2 * Math.PI
-	)
-	
-	const scale = new THREE.Vector3(
-		(Math.random()) + 0.5,
-		(Math.random()) + 0.5,
-		(Math.random()) + 0.5
-	)
-	
-	const keyFrame = new KeyFrame(time, position, rotation, scale)
-	sequence.addKeyFrame(keyFrame)
+  const time = i
+  
+  const position = new THREE.Vector3(
+    (Math.random() * 2 - 1) * 2,
+    (Math.random() * 2 - 1) * 2,
+    (Math.random() * 2 - 1) * 2
+  )
+  
+  const rotation = new THREE.Euler(
+    (Math.random() * 2 - 1) * 2 * Math.PI,
+    (Math.random() * 2 - 1) * 2 * Math.PI,
+    (Math.random() * 2 - 1) * 2 * Math.PI
+  )
+  
+  const scale = new THREE.Vector3(
+    (Math.random()) + 0.5,
+    (Math.random()) + 0.5,
+    (Math.random()) + 0.5
+  )
+  
+  const keyFrame = new KeyFrame(time, position, rotation, scale)
+  sequence.addKeyFrame(keyFrame)
 }

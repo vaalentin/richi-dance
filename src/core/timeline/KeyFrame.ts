@@ -11,16 +11,16 @@ export default class KeyFrame {
     this._time = time
     
     this._position = position !== void 0
-			? position.clone()
-			: new THREE.Vector3(0, 0, 0)
-		
-		this._rotation = position !== void 0
-			? rotation.clone()
-			: new THREE.Euler(0, 0, 0)
-		
-		this._scale = scale !== void 0
-			? scale.clone()
-			: new THREE.Vector3(0, 0, 0)
+      ? position.clone()
+      : new THREE.Vector3(0, 0, 0)
+    
+    this._rotation = position !== void 0
+      ? rotation.clone()
+      : new THREE.Euler(0, 0, 0)
+    
+    this._scale = scale !== void 0
+      ? scale.clone()
+      : new THREE.Vector3(0, 0, 0)
   }
 
   public getTime(): number {
