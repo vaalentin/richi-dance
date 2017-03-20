@@ -40,6 +40,13 @@ const controls = new Controls($timelineControls)
 
 controls.addEventListener(CONTROLS_TOGGLE, () => {
   console.log('toggle')
+
+  if (timeline.isHidden()) {
+    timeline.show()
+  }
+  else {
+    timeline.hide()
+  }
 })
 
 controls.addEventListener(CONTROLS_CLEAR, () => {
@@ -89,3 +96,5 @@ for (let i = 0; i < 11; ++i) {
   const keyFrame = new KeyFrame(time, position, rotation, scale)
   sequence.addKeyFrame(keyFrame)
 }
+
+(window as any).timeline = timeline

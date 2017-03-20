@@ -15,6 +15,7 @@ export default class Timeline {
 
   private _isPlaying: boolean
   private _isMouseDown: boolean
+  private _isHidden: boolean
 
   private _sequence: Sequence
 
@@ -37,6 +38,7 @@ export default class Timeline {
 
     this._isPlaying = false
     this._isMouseDown = false
+    this._isHidden = false
 
     this._sequence = null
 
@@ -242,6 +244,30 @@ export default class Timeline {
 
   public forceRender() {
     this._render()
+  }
+
+  public isHidden() {
+    return this._isHidden
+  }
+
+  public hide() {
+    if (this._isHidden) {
+      return
+    }
+
+    this._isHidden = true
+
+    this._$element.style.display = 'none'
+  }
+
+  public show() {
+    if (!this._isHidden) {
+      return
+    }
+
+    this._isHidden = false
+
+    this._$element.style.display = 'block'
   }
 
   public dispose() {
