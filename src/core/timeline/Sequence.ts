@@ -38,6 +38,18 @@ export default class Sequence {
     }
 
     this._keyFrames.splice(i, 1)
+
+    if (this._timeline) {
+      this._timeline.forceRender()
+    }
+  }
+
+  public clear() {
+    this._keyFrames.length = 0
+
+    if (this._timeline) {
+      this._timeline.forceRender()
+    }
   }
 
   public setTimeline(timeline:Timeline) {

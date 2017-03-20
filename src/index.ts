@@ -53,7 +53,7 @@ controls.addEventListener(CONTROLS_TOGGLE, () => {
 })
 
 controls.addEventListener(CONTROLS_CLEAR, () => {
-  console.log('clear')
+  sequence.clear()
 })
 
 controls.addEventListener(CONTROLS_PLAY, () => {
