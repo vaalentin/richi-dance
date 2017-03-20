@@ -10,6 +10,8 @@ import Timeline from './core/timeline/Timeline'
 import Controls, {
   CONTROLS_TOGGLE,
   CONTROLS_CLEAR,
+  CONTROLS_PLAY,
+  CONTROLS_PAUSE,
   CONTROLS_TOGGLE_CURVES,
   CONTROLS_SPEED_CHANGE,
   CONTROLS_BOUNDARIES_CHANGE
@@ -52,6 +54,18 @@ controls.addEventListener(CONTROLS_TOGGLE, () => {
 
 controls.addEventListener(CONTROLS_CLEAR, () => {
   console.log('clear')
+})
+
+controls.addEventListener(CONTROLS_PLAY, () => {
+  console.log('play')
+
+  timeline.play()
+})
+
+controls.addEventListener(CONTROLS_PAUSE, () => {
+  console.log('pause')
+
+  timeline.pause()
 })
 
 controls.addEventListener(CONTROLS_TOGGLE_CURVES, () => {

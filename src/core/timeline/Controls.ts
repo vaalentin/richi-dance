@@ -3,15 +3,19 @@ import { createElement, appendChild } from '../../core/dom'
 
 export const CONTROLS_TOGGLE = 0
 export const CONTROLS_CLEAR = 1
-export const CONTROLS_TOGGLE_CURVES = 2
-export const CONTROLS_SPEED_CHANGE = 3
-export const CONTROLS_BOUNDARIES_CHANGE = 4
+export const CONTROLS_PLAY = 2
+export const CONTROLS_PAUSE = 3
+export const CONTROLS_TOGGLE_CURVES = 4
+export const CONTROLS_SPEED_CHANGE = 5
+export const CONTROLS_BOUNDARIES_CHANGE = 6
 
 export default class Controls extends EventDispatcher {
   private _$element: HTMLElement
 
   private _$toggleButton: HTMLInputElement
   private _$clearButton: HTMLInputElement
+  private _$playButton: HTMLInputElement
+  private _$pauseButton: HTMLInputElement
   private _$curvesButton: HTMLInputElement
   private _$speedInput: HTMLInputElement
   private _$fromInput: HTMLInputElement
@@ -43,6 +47,22 @@ export default class Controls extends EventDispatcher {
     }) as HTMLInputElement
 
     this._$element.appendChild(this._$clearButton)
+
+    this._$playButton = createElement('input', null, {
+      name: 'play',
+      type: 'button',
+      value: 'Play'
+    }) as HTMLInputElement
+
+    this._$element.appendChild(this._$playButton)
+
+    this._$pauseButton = createElement('input', null, {
+      name: 'pause',
+      type: 'button',
+      value: 'Pause'
+    }) as HTMLInputElement
+
+    this._$element.appendChild(this._$pauseButton)
 
     this._$curvesButton = createElement('input', null, {
       name: 'curves',
@@ -82,6 +102,8 @@ export default class Controls extends EventDispatcher {
   private _bindMethods() {
     this._handleToggle = this._handleToggle.bind(this)
     this._handleClear = this._handleClear.bind(this)
+    this._handlePlay = this._handlePlay.bind(this)
+    this._handlePause = this._handlePause.bind(this)
     this._handleToggleCurves = this._handleToggleCurves.bind(this)
     this._handleSpeedChange = this._handleSpeedChange.bind(this)
     this._handleBoundariesChange = this._handleBoundariesChange.bind(this)
@@ -90,6 +112,8 @@ export default class Controls extends EventDispatcher {
   private _addListeners() {
     this._$toggleButton.addEventListener('click', this._handleToggle)
     this._$clearButton.addEventListener('click', this._handleClear)
+    this._$playButton.addEventListener('click', this._handlePlay)
+    this._$pauseButton.addEventListener('click', this._handlePause)
     this._$curvesButton.addEventListener('click', this._handleToggleCurves)
     this._$speedInput.addEventListener('input', this._handleSpeedChange)
     this._$fromInput.addEventListener('input', this._handleBoundariesChange)
@@ -99,6 +123,8 @@ export default class Controls extends EventDispatcher {
   private _removeListeners() {
     this._$toggleButton.removeEventListener('click', this._handleToggle)
     this._$clearButton.removeEventListener('click', this._handleClear)
+    this._$playButton.removeEventListener('click', this._handlePlay)
+    this._$pauseButton.removeEventListener('click', this._handlePause)
     this._$curvesButton.removeEventListener('click', this._handleToggleCurves)
     this._$speedInput.removeEventListener('input', this._handleSpeedChange)
     this._$fromInput.removeEventListener('input', this._handleBoundariesChange)
@@ -111,6 +137,14 @@ export default class Controls extends EventDispatcher {
 
   private _handleClear() {
     this.dispatchEvent(CONTROLS_CLEAR)
+  }
+
+  private _handlePlay() {
+    this.dispatchEvent(CONTROLS_PLAY)
+  }
+
+  private _handlePause() {
+    this.dispatchEvent(CONTROLS_PAUSE)
   }
 
   private _handleToggleCurves() {
