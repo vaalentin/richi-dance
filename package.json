@@ -21,6 +21,7 @@
     "normalize.css": "^5.0.0",
     "style-loader": "^0.14.1",
     "three": "^0.84.0",
+    "three-orbitcontrols": "^1.1.2",
     "three-transformcontrols": "^0.78.1"
   }
 }

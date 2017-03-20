@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import * as TransformControls from 'three-transformcontrols'
+import * as OrbitControls from 'three-orbitcontrols'
 
 export default class Scene {
   private _$element: HTMLElement
@@ -11,6 +12,7 @@ export default class Scene {
   private _camera: THREE.PerspectiveCamera
 
   private _transformControls
+  private _orbitControls
 
   private _requestAnimationFrameId: number;
 
@@ -29,6 +31,7 @@ export default class Scene {
 
     this._transformControls = new TransformControls(this._camera, this._$element)
     this._scene.add(this._transformControls)
+    this._orbitControls = new OrbitControls(this._camera, this._$element)
 
     this._requestAnimationFrameId = null
 

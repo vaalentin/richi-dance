@@ -2793,6 +2793,10 @@ tar@~2.2.1:
     fstream "^1.0.2"
     inherits "2"
 
+three-orbitcontrols@^1.1.2:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/three-orbitcontrols/-/three-orbitcontrols-1.1.2.tgz#1236b79471ed7abdc444f089f8eb1c52433061de"
+
 three-transformcontrols@^0.78.1:
   version "0.78.1"
   resolved "https://registry.yarnpkg.com/three-transformcontrols/-/three-transformcontrols-0.78.1.tgz#bcff06f4fd3239743d93cfc3c1f0d49ece70b5f4"
