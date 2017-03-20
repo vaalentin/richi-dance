@@ -52,10 +52,14 @@ controls.addEventListener(CONTROLS_TOGGLE_CURVES, () => {
 
 controls.addEventListener(CONTROLS_SPEED_CHANGE, (speed: number) => {
   console.log(`change speed: ${speed}`)
+
+  timeline.setSpeed(speed)
 })
 
 controls.addEventListener(CONTROLS_BOUNDARIES_CHANGE, ([from, to]: [number, number]) => {
   console.log(`change boundaries: [${from}, ${to}]`)
+
+  timeline.setBoundaries(from, to)
 })
 
 const sequence = new Sequence(cube)
