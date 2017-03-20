@@ -2793,7 +2793,13 @@ tar@~2.2.1:
     fstream "^1.0.2"
     inherits "2"
 
-three@^0.84.0:
+three-transformcontrols@^0.78.1:
+  version "0.78.1"
+  resolved "https://registry.yarnpkg.com/three-transformcontrols/-/three-transformcontrols-0.78.1.tgz#bcff06f4fd3239743d93cfc3c1f0d49ece70b5f4"
+  dependencies:
+    three ">=0.78.0"
+
+three@>=0.78.0, three@^0.84.0:
   version "0.84.0"
   resolved "https://registry.yarnpkg.com/three/-/three-0.84.0.tgz#95be85a55a0fa002aa625ed559130957dcffd918"
 

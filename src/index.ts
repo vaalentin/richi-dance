@@ -32,6 +32,7 @@ const cube = new THREE.Mesh(
 )
 
 scene.add(cube)
+scene.attachToTransformControls(cube)
 
 const timeline = new Timeline($timelineViewport)
 timeline.setBoundaries(0, 10)
