@@ -7,17 +7,7 @@ import Scene from './core/webgl/Scene'
 import KeyFrame from './core/timeline/KeyFrame'
 import Sequence from './core/timeline/Sequence'
 import Timeline from './core/timeline/Timeline'
-import Controls, {
-  CONTROLS_TOGGLE,
-  CONTROLS_CLEAR,
-  CONTROLS_PLAY,
-  CONTROLS_PAUSE,
-  CONTROLS_TOGGLE_CURVES,
-  CONTROLS_SPEED_CHANGE,
-  CONTROLS_BOUNDARIES_CHANGE,
-  CONTROLS_TOGGLE_SNAP,
-  CONTROLS_RESOLUTION_CHANGE
-} from './core/timeline/Controls'
+import TimelineControls from './core/timeline/TimelineControls'
 
 const $app = document.querySelector('.app') as HTMLElement
 const $viewport = $app.querySelector('.viewport') as HTMLElement
@@ -41,58 +31,7 @@ scene.attachToTransformControls(cube)
 const timeline = new Timeline($timelineViewport)
 timeline.setBoundaries(0, 10)
 
-const controls = new Controls($timelineControls)
-
-controls.addEventListener(CONTROLS_TOGGLE, () => {
-  console.log('toggle')
-
-  if (timeline.isHidden()) {
-    timeline.show()
-  }
-  else {
-    timeline.hide()
-  }
-})
-
-controls.addEventListener(CONTROLS_CLEAR, () => {
-  sequence.clear()
-})
-
-controls.addEventListener(CONTROLS_PLAY, () => {
-  console.log('play')
-
-  timeline.play()
-})
-
-controls.addEventListener(CONTROLS_PAUSE, () => {
-  console.log('pause')
-
-  timeline.pause()
-})
-
-controls.addEventListener(CONTROLS_TOGGLE_CURVES, () => {
-  console.log('toggle curves')
-})
-
-controls.addEventListener(CONTROLS_SPEED_CHANGE, (speed: number) => {
-  console.log(`change speed: ${speed}`)
-
-  timeline.setSpeed(speed)
-})
-
-controls.addEventListener(CONTROLS_BOUNDARIES_CHANGE, ([from, to]: [number, number]) => {
-  console.log(`change boundaries: [${from}, ${to}]`)
-
-  timeline.setBoundaries(from, to)
-})
-
-controls.addEventListener(CONTROLS_TOGGLE_SNAP, () => {
-  timeline.toggleSnap()
-})
-
-controls.addEventListener(CONTROLS_RESOLUTION_CHANGE, (resolution: number) => {
-  timeline.setResolution(resolution)
-})
+const controls = new TimelineControls(timeline, $timelineControls)
 
 const sequence = new Sequence(cube)
 timeline.addSequence(sequence)

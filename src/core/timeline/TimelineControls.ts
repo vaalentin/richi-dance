@@ -1,17 +1,9 @@
-import EventDispatcher from '../EventDispatcher'
 import { createElement, appendChild } from '../../core/dom'
+import Timeline from './Timeline'
 
-export const CONTROLS_TOGGLE = 0
-export const CONTROLS_CLEAR = 1
-export const CONTROLS_PLAY = 2
-export const CONTROLS_PAUSE = 3
-export const CONTROLS_TOGGLE_CURVES = 4
-export const CONTROLS_SPEED_CHANGE = 5
-export const CONTROLS_BOUNDARIES_CHANGE = 6
-export const CONTROLS_TOGGLE_SNAP = 7
-export const CONTROLS_RESOLUTION_CHANGE = 8
+export default class Controls {
+  private _timeline: Timeline
 
-export default class Controls extends EventDispatcher {
   private _$element: HTMLElement
 
   private _$toggleButton: HTMLInputElement
@@ -25,9 +17,9 @@ export default class Controls extends EventDispatcher {
   private _$snapButton: HTMLInputElement
   private _$resolution: HTMLInputElement
 
-  constructor($element: HTMLElement) {
-    super()
-
+  constructor(timeline: Timeline, $element: HTMLElement) {
+    this._timeline = timeline
+    
     this._$element = $element
 
     this._createElements()
@@ -160,29 +152,33 @@ export default class Controls extends EventDispatcher {
   }
 
   private _handleToggle() {
-    this.dispatchEvent(CONTROLS_TOGGLE)
+    this._timeline.toggle()
   }
 
   private _handleClear() {
-    this.dispatchEvent(CONTROLS_CLEAR)
+    const sequence = this._timeline.getActiveSequence()
+
+    if (sequence) {
+      sequence.clear()
+    }
   }
 
   private _handlePlay() {
-    this.dispatchEvent(CONTROLS_PLAY)
+    this._timeline.play()
   }
 
   private _handlePause() {
-    this.dispatchEvent(CONTROLS_PAUSE)
+    this._timeline.pause()
   }
 
   private _handleToggleCurves() {
-    this.dispatchEvent(CONTROLS_TOGGLE_CURVES)
+    
   }
 
   private _handleSpeedChange() {
     const speed = parseFloat(this._$speedInput.value)
     
-    this.dispatchEvent(CONTROLS_SPEED_CHANGE, speed)
+    this._timeline.setSpeed(speed)
   }
 
   private _handleBoundariesChange() {
@@ -199,11 +195,11 @@ export default class Controls extends EventDispatcher {
       this._$toInput.value = to.toString()
     }
 
-    this.dispatchEvent(CONTROLS_BOUNDARIES_CHANGE, [from, to])
+    this._timeline.setBoundaries(from, to)
   }
 
   private _handleToggleSnap() {
-    this.dispatchEvent(CONTROLS_TOGGLE_SNAP)
+    this._timeline.toggleSnap()
   }
 
   private _handleResolutionChange() {
@@ -211,12 +207,10 @@ export default class Controls extends EventDispatcher {
 
     this._$resolution.value = resolution.toString()
 
-    this.dispatchEvent(CONTROLS_RESOLUTION_CHANGE, resolution)
+    this._timeline.setResolution(resolution)
   }
 
   dispose() {
     this._removeListeners()
-
-    super.dispose()
   }
 }
