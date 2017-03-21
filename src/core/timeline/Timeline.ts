@@ -267,6 +267,10 @@ export default class Timeline {
   }
 
   public play() {
+    if (this._isPlaying) {
+      return
+    }
+
     this._isPlaying = true
     
     this._clock.start()
@@ -274,6 +278,10 @@ export default class Timeline {
   }
   
   public pause() {
+    if (!this._isPlaying) {
+      return
+    }
+    
     this._isPlaying = false
     
     this._clock.stop()
