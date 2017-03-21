@@ -14,7 +14,9 @@ import Controls, {
   CONTROLS_PAUSE,
   CONTROLS_TOGGLE_CURVES,
   CONTROLS_SPEED_CHANGE,
-  CONTROLS_BOUNDARIES_CHANGE
+  CONTROLS_BOUNDARIES_CHANGE,
+  CONTROLS_TOGGLE_SNAP,
+  CONTROLS_SNAP_RESOLUTION_CHANGE
 } from './core/timeline/Controls'
 
 const $app = document.querySelector('.app') as HTMLElement
@@ -82,6 +84,14 @@ controls.addEventListener(CONTROLS_BOUNDARIES_CHANGE, ([from, to]: [number, numb
   console.log(`change boundaries: [${from}, ${to}]`)
 
   timeline.setBoundaries(from, to)
+})
+
+controls.addEventListener(CONTROLS_TOGGLE_SNAP, () => {
+  timeline.toggleSnap()
+})
+
+controls.addEventListener(CONTROLS_SNAP_RESOLUTION_CHANGE, (resolution: number) => {
+  timeline.setSnapResolution(resolution)
 })
 
 const sequence = new Sequence(cube)

@@ -8,6 +8,8 @@ export const CONTROLS_PAUSE = 3
 export const CONTROLS_TOGGLE_CURVES = 4
 export const CONTROLS_SPEED_CHANGE = 5
 export const CONTROLS_BOUNDARIES_CHANGE = 6
+export const CONTROLS_TOGGLE_SNAP = 7
+export const CONTROLS_SNAP_RESOLUTION_CHANGE = 8
 
 export default class Controls extends EventDispatcher {
   private _$element: HTMLElement
@@ -20,6 +22,8 @@ export default class Controls extends EventDispatcher {
   private _$speedInput: HTMLInputElement
   private _$fromInput: HTMLInputElement
   private _$toInput: HTMLInputElement
+  private _$snapButton: HTMLInputElement
+  private _$snapResolution: HTMLInputElement
 
   constructor($element: HTMLElement) {
     super()
@@ -97,6 +101,24 @@ export default class Controls extends EventDispatcher {
     }) as HTMLInputElement
 
     this._$element.appendChild(this._$toInput)
+
+    this._$snapButton = createElement('input', null, {
+      name: 'snap',
+      type: 'button',
+      value: 'Toggle snap'
+    }) as HTMLInputElement
+
+    this._$element.appendChild(this._$snapButton)
+
+    this._$snapResolution = createElement('input', null, {
+      name: 'to',
+      type: 'number',
+      min: '1',
+      max: '10',
+      value: '1'
+    }) as HTMLInputElement
+
+    this._$element.appendChild(this._$snapResolution)
   }
 
   private _bindMethods() {
@@ -107,6 +129,8 @@ export default class Controls extends EventDispatcher {
     this._handleToggleCurves = this._handleToggleCurves.bind(this)
     this._handleSpeedChange = this._handleSpeedChange.bind(this)
     this._handleBoundariesChange = this._handleBoundariesChange.bind(this)
+    this._handleToggleSnap = this._handleToggleSnap.bind(this)
+    this._handleSnapResolutionChange = this._handleSnapResolutionChange.bind(this)
   }
 
   private _addListeners() {
@@ -118,6 +142,8 @@ export default class Controls extends EventDispatcher {
     this._$speedInput.addEventListener('input', this._handleSpeedChange)
     this._$fromInput.addEventListener('input', this._handleBoundariesChange)
     this._$toInput.addEventListener('input', this._handleBoundariesChange)
+    this._$snapButton.addEventListener('click', this._handleToggleSnap)
+    this._$snapResolution.addEventListener('input', this._handleSnapResolutionChange)
   }
 
   private _removeListeners() {
@@ -129,6 +155,8 @@ export default class Controls extends EventDispatcher {
     this._$speedInput.removeEventListener('input', this._handleSpeedChange)
     this._$fromInput.removeEventListener('input', this._handleBoundariesChange)
     this._$toInput.removeEventListener('input', this._handleBoundariesChange)
+    this._$snapButton.removeEventListener('click', this._handleToggleSnap)
+    this._$snapResolution.removeEventListener('input', this._handleSnapResolutionChange)
   }
 
   private _handleToggle() {
@@ -172,6 +200,16 @@ export default class Controls extends EventDispatcher {
     }
 
     this.dispatchEvent(CONTROLS_BOUNDARIES_CHANGE, [from, to])
+  }
+
+  private _handleToggleSnap() {
+    this.dispatchEvent(CONTROLS_TOGGLE_SNAP)
+  }
+
+  private _handleSnapResolutionChange() {
+    const resolution = Math.round(parseFloat(this._$snapResolution.value))
+
+    this.dispatchEvent(CONTROLS_SNAP_RESOLUTION_CHANGE, resolution)
   }
 
   dispose() {
