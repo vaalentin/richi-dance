@@ -13,10 +13,12 @@ export default class Timeline {
   private _boundaries: [number, number]
   private _progress: number
   private _speed: number
+  private _snapResolution: number
 
   private _isPlaying: boolean
   private _isMouseDown: boolean
   private _isHidden: boolean
+  private _isSnapEnabled: boolean
 
   private _sequence: Sequence
 
@@ -36,10 +38,12 @@ export default class Timeline {
     this._boundaries = [0, 0]
     this._progress = 0
     this._speed = 1
+    this._snapResolution = 1
 
     this._isPlaying = false
     this._isMouseDown = false
     this._isHidden = false
+    this._isSnapEnabled = false
 
     this._sequence = null
 
@@ -279,6 +283,14 @@ export default class Timeline {
     this._isHidden = false
 
     this._$element.style.display = 'block'
+  }
+
+  public toggleSnap() {
+    this._isSnapEnabled = !this._isSnapEnabled
+  }
+
+  public setSnapResolution(resolution: number) {
+    this._snapResolution = resolution
   }
 
   public dispose() {
