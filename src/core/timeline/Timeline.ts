@@ -112,7 +112,13 @@ export default class Timeline {
     }
     
     this._progress = offsetX / this._$canvas.width
-    
+
+    const snapInterval = 1
+    const snapSteps = (this._boundaries[1] - this._boundaries[0]) * snapInterval
+
+    // snap
+    this._progress = Math.round(this._progress * snapSteps) / snapSteps
+
     this._render()
     this._updateSequence()
   }
