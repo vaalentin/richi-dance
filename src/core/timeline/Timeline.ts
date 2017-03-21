@@ -139,10 +139,14 @@ export default class Timeline {
     this._progress = x / this._$canvas.width
 
     if (this._isSnapEnabled) {
-      const snapSteps = (this._boundaries[1] - this._boundaries[0]) * this._snapResolution
+      this._snapProgress() 
+    }
+  }
 
-      this._progress = Math.round(this._progress * snapSteps) / snapSteps
-    }    
+  private _snapProgress() {
+    const snapSteps = (this._boundaries[1] - this._boundaries[0]) * this._snapResolution
+
+    this._progress = Math.round(this._progress * snapSteps) / snapSteps
   }
 
   private _update() {
@@ -287,10 +291,20 @@ export default class Timeline {
 
   public toggleSnap() {
     this._isSnapEnabled = !this._isSnapEnabled
+
+    if (this._isSnapEnabled) {
+      this._snapProgress()
+      this._render()
+    }
   }
 
   public setSnapResolution(resolution: number) {
     this._snapResolution = resolution
+
+    if (this._isSnapEnabled) {
+      this._snapProgress()
+      this._render()
+    }
   }
 
   public dispose() {
