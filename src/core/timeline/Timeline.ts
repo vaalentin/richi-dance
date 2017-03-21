@@ -92,7 +92,7 @@ export default class Timeline {
       this.pause()
     }
     
-    this._progress = offsetX / this._$canvas.width
+    this._updateProgress(offsetX)
     
     this._render()
     this._updateSequence()
@@ -111,13 +111,7 @@ export default class Timeline {
       return
     }
     
-    this._progress = offsetX / this._$canvas.width
-
-    const snapInterval = 1
-    const snapSteps = (this._boundaries[1] - this._boundaries[0]) * snapInterval
-
-    // snap
-    this._progress = Math.round(this._progress * snapSteps) / snapSteps
+    this._updateProgress(offsetX)
 
     this._render()
     this._updateSequence()
@@ -135,6 +129,16 @@ export default class Timeline {
         
         break
     }
+  }
+
+  private _updateProgress(x: number) {
+    this._progress = x / this._$canvas.width
+
+    if (this._isSnapEnabled) {
+      const snapSteps = (this._boundaries[1] - this._boundaries[0]) * this._snapResolution
+
+      this._progress = Math.round(this._progress * snapSteps) / snapSteps
+    }    
   }
 
   private _update() {
