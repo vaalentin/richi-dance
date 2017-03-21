@@ -52,7 +52,7 @@ export default class Sequence {
     }
   }
 
-  public setTimeline(timeline:Timeline) {
+  public setTimeline(timeline: Timeline|null) {
     this._timeline = timeline
   }
 
