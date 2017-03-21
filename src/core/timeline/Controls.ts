@@ -9,7 +9,7 @@ export const CONTROLS_TOGGLE_CURVES = 4
 export const CONTROLS_SPEED_CHANGE = 5
 export const CONTROLS_BOUNDARIES_CHANGE = 6
 export const CONTROLS_TOGGLE_SNAP = 7
-export const CONTROLS_SNAP_RESOLUTION_CHANGE = 8
+export const CONTROLS_RESOLUTION_CHANGE = 8
 
 export default class Controls extends EventDispatcher {
   private _$element: HTMLElement
@@ -23,7 +23,7 @@ export default class Controls extends EventDispatcher {
   private _$fromInput: HTMLInputElement
   private _$toInput: HTMLInputElement
   private _$snapButton: HTMLInputElement
-  private _$snapResolution: HTMLInputElement
+  private _$resolution: HTMLInputElement
 
   constructor($element: HTMLElement) {
     super()
@@ -110,7 +110,7 @@ export default class Controls extends EventDispatcher {
 
     this._$element.appendChild(this._$snapButton)
 
-    this._$snapResolution = createElement('input', null, {
+    this._$resolution = createElement('input', null, {
       name: 'to',
       type: 'number',
       min: '1',
@@ -118,7 +118,7 @@ export default class Controls extends EventDispatcher {
       value: '1'
     }) as HTMLInputElement
 
-    this._$element.appendChild(this._$snapResolution)
+    this._$element.appendChild(this._$resolution)
   }
 
   private _bindMethods() {
@@ -130,7 +130,7 @@ export default class Controls extends EventDispatcher {
     this._handleSpeedChange = this._handleSpeedChange.bind(this)
     this._handleBoundariesChange = this._handleBoundariesChange.bind(this)
     this._handleToggleSnap = this._handleToggleSnap.bind(this)
-    this._handleSnapResolutionChange = this._handleSnapResolutionChange.bind(this)
+    this._handleResolutionChange = this._handleResolutionChange.bind(this)
   }
 
   private _addListeners() {
@@ -143,7 +143,7 @@ export default class Controls extends EventDispatcher {
     this._$fromInput.addEventListener('input', this._handleBoundariesChange)
     this._$toInput.addEventListener('input', this._handleBoundariesChange)
     this._$snapButton.addEventListener('click', this._handleToggleSnap)
-    this._$snapResolution.addEventListener('input', this._handleSnapResolutionChange)
+    this._$resolution.addEventListener('input', this._handleResolutionChange)
   }
 
   private _removeListeners() {
@@ -156,7 +156,7 @@ export default class Controls extends EventDispatcher {
     this._$fromInput.removeEventListener('input', this._handleBoundariesChange)
     this._$toInput.removeEventListener('input', this._handleBoundariesChange)
     this._$snapButton.removeEventListener('click', this._handleToggleSnap)
-    this._$snapResolution.removeEventListener('input', this._handleSnapResolutionChange)
+    this._$resolution.removeEventListener('input', this._handleResolutionChange)
   }
 
   private _handleToggle() {
@@ -206,10 +206,12 @@ export default class Controls extends EventDispatcher {
     this.dispatchEvent(CONTROLS_TOGGLE_SNAP)
   }
 
-  private _handleSnapResolutionChange() {
-    const resolution = Math.round(parseFloat(this._$snapResolution.value))
+  private _handleResolutionChange() {
+    const resolution = Math.round(parseFloat(this._$resolution.value))
 
-    this.dispatchEvent(CONTROLS_SNAP_RESOLUTION_CHANGE, resolution)
+    this._$resolution.value = resolution.toString()
+
+    this.dispatchEvent(CONTROLS_RESOLUTION_CHANGE, resolution)
   }
 
   dispose() {

@@ -16,7 +16,7 @@ import Controls, {
   CONTROLS_SPEED_CHANGE,
   CONTROLS_BOUNDARIES_CHANGE,
   CONTROLS_TOGGLE_SNAP,
-  CONTROLS_SNAP_RESOLUTION_CHANGE
+  CONTROLS_RESOLUTION_CHANGE
 } from './core/timeline/Controls'
 
 const $app = document.querySelector('.app') as HTMLElement
@@ -90,8 +90,8 @@ controls.addEventListener(CONTROLS_TOGGLE_SNAP, () => {
   timeline.toggleSnap()
 })
 
-controls.addEventListener(CONTROLS_SNAP_RESOLUTION_CHANGE, (resolution: number) => {
-  timeline.setSnapResolution(resolution)
+controls.addEventListener(CONTROLS_RESOLUTION_CHANGE, (resolution: number) => {
+  timeline.setResolution(resolution)
 })
 
 const sequence = new Sequence(cube)
