@@ -2,8 +2,12 @@ import * as THREE from 'three'
 import * as TransformControls from 'three-transformcontrols'
 import * as OrbitControls from 'three-orbitcontrols'
 
-export default class Scene {
+import EventDispatcher from '../EventDispatcher'
 import * as Keys from '../Keys'
+
+export const SCENE_RAYCAST = 0
+
+export default class Scene extends EventDispatcher {
   private _$element: HTMLElement
 
   private _scene: THREE.Scene
@@ -15,9 +19,15 @@ import * as Keys from '../Keys'
   private _transformControls
   private _orbitControls
 
+  private _objectsToRaycast: THREE.Object3D[]
+  private _raycaster: THREE.Raycaster
+  private _mouse: THREE.Vector2
+
   private _requestAnimationFrameId: number;
 
   constructor($element: HTMLElement) {
+    super()
+
     this._$element = $element
 
     const { offsetWidth: width, offsetHeight: height } = this._$element
@@ -36,12 +46,18 @@ import * as Keys from '../Keys'
 
     this._requestAnimationFrameId = null
 
+    this._objectsToRaycast = []
+    this._raycaster = new THREE.Raycaster()
+    this._mouse = new THREE.Vector2(-1, -1)
+
     this._bindMethods()
     this._addListeners()
   }
 
   private _bindMethods() {
     this._handleResize = this._handleResize.bind(this)
+    this._handleMouseMove = this._handleMouseMove.bind(this)
+    this._handleMouseDown = this._handleMouseDown.bind(this)
     this._handleKeyDown = this._handleKeyDown.bind(this)
     this._handleKeyUp = this._handleKeyUp.bind(this)
     this._update = this._update.bind(this)
@@ -50,6 +66,8 @@ import * as Keys from '../Keys'
 
   private _addListeners() {
     window.addEventListener('resize', this._handleResize)
+    this._$element.addEventListener('mousemove', this._handleMouseMove)
+    this._$element.addEventListener('mousedown', this._handleMouseDown)
     document.addEventListener('keydown', this._handleKeyDown)
     document.addEventListener('keyup', this._handleKeyUp)
     this._transformControls.addEventListener('change', this._render)
@@ -57,6 +75,8 @@ import * as Keys from '../Keys'
 
   private _removeListeners() {
     window.removeEventListener('resize', this._handleResize)
+    this._$element.removeEventListener('mousemove', this._handleMouseMove)
+    this._$element.removeEventListener('mousedown', this._handleMouseDown)
     document.removeEventListener('keydown', this._handleKeyDown)
     document.removeEventListener('keyup', this._handleKeyUp)
     this._transformControls.removeEventListener('change', this._render)
@@ -69,6 +89,17 @@ import * as Keys from '../Keys'
 
     this._camera.aspect = width / height
     this._camera.updateProjectionMatrix()
+  }
+
+  private _handleMouseMove({ clientX, clientY }: MouseEvent) {
+    const x = (clientX / window.innerWidth) * 2 - 1
+	  const y = -(clientY / window.innerHeight) * 2 + 1
+
+    this._mouse.set(x, y)
+  }
+
+  private _handleMouseDown() {
+    this._raycast()
   }
 
   private _handleKeyDown({ keyCode }: KeyboardEvent) {
@@ -121,6 +152,20 @@ import * as Keys from '../Keys'
     }
   }
 
+  private _raycast() {
+    if (!this._objectsToRaycast.length) {
+      return
+    }
+
+    this._raycaster.setFromCamera(this._mouse, this._camera)
+
+    const intersections = this._raycaster.intersectObjects(this._objectsToRaycast)
+
+    for (let intersection of intersections) {
+      this.dispatchEvent(SCENE_RAYCAST, intersection)
+    }
+  }
+
   private _update() {
     this._requestAnimationFrameId = window.requestAnimationFrame(this._update)
 
@@ -157,6 +202,22 @@ import * as Keys from '../Keys'
     }
   }
 
+  public addToRaycast(...objects: THREE.Object3D[]) {
+    for (let object of objects) {
+      this._objectsToRaycast.push(object)
+    }
+  }
+
+  public removeFromRaycast(...objects: THREE.Object3D[]) {
+    for (let object of objects) {
+      const i = this._objectsToRaycast.indexOf(object)
+
+      if (i !== -1) {
+        this._objectsToRaycast.splice(i, 1)
+      }
+    }
+  }
+
   public attachToTransformControls(object: THREE.Object3D) {
     this._transformControls.attach(object)
   }
@@ -167,5 +228,8 @@ import * as Keys from '../Keys'
 
   public dispose() {
     this.stop()
+    this._removeListeners()
+
+    super.dispose()
   }
 }
