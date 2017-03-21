@@ -95,7 +95,8 @@ controls.addEventListener(CONTROLS_RESOLUTION_CHANGE, (resolution: number) => {
 })
 
 const sequence = new Sequence(cube)
-timeline.setSequence(sequence)
+timeline.addSequence(sequence)
+timeline.setActiveSequence(sequence)
 
 for (let i = 0; i < 11; ++i) {
   const time = i

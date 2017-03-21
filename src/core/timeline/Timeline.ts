@@ -28,7 +28,8 @@ export default class Timeline {
 
   private _renderMask: number
 
-  private _sequence: Sequence
+  private _sequences: Sequence[]
+  private _activeSequence: Sequence
 
   private _clock: THREE.Clock
   private _requestAnimationFrameId: number
@@ -55,7 +56,8 @@ export default class Timeline {
 
     this._renderMask = Render.TICKS | Render.KEYFRAMES | Render.CURSOR
 
-    this._sequence = null
+    this._sequences = []
+    this._activeSequence = null
 
     this._clock = new THREE.Clock()
     this._requestAnimationFrameId = null
@@ -177,13 +179,15 @@ export default class Timeline {
   }
   
   private _updateSequence() {
-    if (!this._sequence) {
+    if (!this._activeSequence) {
       return
     }
     
     const time = (this._progress * (this._boundaries[1] - this._boundaries[0])) + this._boundaries[0]
     
-    this._sequence.setTime(time)
+    for (let sequence of this._sequences) {
+      sequence.setTime(time)
+    }
   }
 
   private _render() {
@@ -212,11 +216,11 @@ export default class Timeline {
       }
     }
 
-    if (this._renderMask & Render.KEYFRAMES && this._sequence) {
+    if (this._renderMask & Render.KEYFRAMES && this._activeSequence) {
       this._context.strokeStyle = 'green'
       this._context.lineWidth = 2
       
-      const keyFrames = this._sequence.getKeyFrames()
+      const keyFrames = this._activeSequence.getKeyFrames()
       
       for (let i = 0; i < keyFrames.length; ++i) {
         const keyFrame = keyFrames[i]
@@ -260,10 +264,46 @@ export default class Timeline {
     this._speed = speed
   }
 
-  public setSequence(sequence: Sequence) {
-    sequence.setTimeline(this)
-    
-    this._sequence = sequence
+  public addSequence(sequence: Sequence) {
+    const i = this._sequences.indexOf(sequence)
+
+    if (i !== -1) {
+      return
+    }
+
+    this._sequences.push(sequence)
+  }
+
+  public removeSequence(sequence: Sequence) {
+    const i = this._sequences.indexOf(sequence)
+
+    if (i === -1) {
+      return
+    }
+
+    this._sequences.splice(i, 1)
+  }
+
+  public getActiveSequence(): Sequence|null {
+    return this._activeSequence
+  }
+
+  public setActiveSequence(sequence: Sequence|null) {
+    if (this._activeSequence) {
+      this._activeSequence.setTimeline(null)
+      this._activeSequence = null
+    }
+
+    if (sequence) {
+      const i = this._sequences.indexOf(sequence)
+
+      if (i === -1) {
+        return
+      }
+      
+      sequence.setTimeline(this)
+      this._activeSequence = sequence
+    }
   }
 
   public play() {
