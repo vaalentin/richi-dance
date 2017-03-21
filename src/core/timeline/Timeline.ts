@@ -4,6 +4,12 @@ import Sequence from './Sequence'
 import { mapValueToRange } from '../math'
 import * as Keys from '../Keys'
 
+export const Render = {
+  TICKS: 1 << 0,
+  CURSOR: 1 << 1,
+  KEYFRAMES: 1 << 2
+}
+
 export default class Timeline {
   private _$element: HTMLElement
 
@@ -19,6 +25,8 @@ export default class Timeline {
   private _isMouseDown: boolean
   private _isHidden: boolean
   private _isSnapEnabled: boolean
+
+  private _renderMask: number
 
   private _sequence: Sequence
 
@@ -44,6 +52,8 @@ export default class Timeline {
     this._isMouseDown = false
     this._isHidden = false
     this._isSnapEnabled = false
+
+    this._renderMask = Render.TICKS | Render.KEYFRAMES | Render.CURSOR
 
     this._sequence = null
 
@@ -186,15 +196,15 @@ export default class Timeline {
     
     for (let i = 0; i < steps; i += 1) {
       const x = (i / steps) * this._$canvas.width
+    if (this._renderMask & Render.TICKS) {
       
       this._context.beginPath()
       this._context.moveTo(x, 0)
       this._context.lineTo(x, this._$canvas.height)
       this._context.stroke()
     }
-    
-    // keyframes
-    if (this._sequence) {
+
+    if (this._renderMask & Render.KEYFRAMES && this._sequence) {
       this._context.strokeStyle = 'green'
       
       const keyFrames = this._sequence.getKeyFrames()
@@ -216,10 +226,10 @@ export default class Timeline {
         this._context.stroke()
       }
     }
-    
-    // mouse
-    if (this._progress !== null) {
+
+    if (this._renderMask & Render.CURSOR) {
       this._context.strokeStyle = 'red'
+      this._context.lineWidth = 2
       
       const x = this._progress * this._$canvas.width
       
@@ -305,6 +315,11 @@ export default class Timeline {
       this._snapProgress()
       this._render()
     }
+
+  }
+
+  public setRenderMask(mask: number) {
+    this._renderMask = mask
   }
 
   public dispose() {
