@@ -189,23 +189,32 @@ export default class Timeline {
   private _render() {
     this._context.clearRect(0, 0, this._$canvas.width, this._$canvas.height)
   
-    // ticks
-    this._context.strokeStyle = 'white'
-    
-    const steps = this._boundaries[1] - this._boundaries[0]
-    
-    for (let i = 0; i < steps; i += 1) {
-      const x = (i / steps) * this._$canvas.width
     if (this._renderMask & Render.TICKS) {
+      this._context.strokeStyle = 'grey'
+
+      const steps = (this._boundaries[1] - this._boundaries[0]) * this._snapResolution
       
-      this._context.beginPath()
-      this._context.moveTo(x, 0)
-      this._context.lineTo(x, this._$canvas.height)
-      this._context.stroke()
+      for (let i = 0, j = 0; i < steps; ++i, ++j) {
+        let x = (i / steps) * this._$canvas.width
+
+        if (j === this._snapResolution) {
+          j = 0
+          this._context.lineWidth = 2
+        }
+        else {
+          this._context.lineWidth = 1
+        }
+        
+        this._context.beginPath()
+        this._context.moveTo(x, 0)
+        this._context.lineTo(x, this._$canvas.height)
+        this._context.stroke()
+      }
     }
 
     if (this._renderMask & Render.KEYFRAMES && this._sequence) {
       this._context.strokeStyle = 'green'
+      this._context.lineWidth = 2
       
       const keyFrames = this._sequence.getKeyFrames()
       
@@ -304,18 +313,19 @@ export default class Timeline {
 
     if (this._isSnapEnabled) {
       this._snapProgress()
-      this._render()
     }
+
+    this._render()
   }
 
-  public setSnapResolution(resolution: number) {
+  public setResolution(resolution: number) {
     this._snapResolution = resolution
 
     if (this._isSnapEnabled) {
       this._snapProgress()
-      this._render()
     }
 
+    this._render()
   }
 
   public setRenderMask(mask: number) {
