@@ -18,6 +18,7 @@ export default class Timeline {
 
   private _boundaries: [number, number]
   private _progress: number
+  private _time: number
   private _speed: number
   private _snapResolution: number
 
@@ -153,12 +154,20 @@ export default class Timeline {
     if (this._isSnapEnabled) {
       this._snapProgress() 
     }
+
+    this._updateTime()
   }
 
   private _snapProgress() {
     const snapSteps = (this._boundaries[1] - this._boundaries[0]) * this._snapResolution
 
     this._progress = Math.round(this._progress * snapSteps) / snapSteps
+  }
+
+  private _updateTime() {
+    this._time = (this._progress * (this._boundaries[1] - this._boundaries[0])) + this._boundaries[0]
+
+    this.onTimeChange.dispatch(this._time)
   }
 
   private _update() {
@@ -174,6 +183,7 @@ export default class Timeline {
       this._progress -= 1
     }
     
+    this._updateTime()
     this._render()
     this._updateSequence()
   }
@@ -183,10 +193,8 @@ export default class Timeline {
       return
     }
     
-    const time = (this._progress * (this._boundaries[1] - this._boundaries[0])) + this._boundaries[0]
-    
     for (let sequence of this._sequences) {
-      sequence.setTime(time)
+      sequence.setTime(this._time)
     }
   }
 
