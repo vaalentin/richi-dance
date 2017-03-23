@@ -38,43 +38,32 @@ const sequence = new Sequence(cube)
 timeline.addSequence(sequence)
 timeline.setActiveSequence(sequence)
 
-for (let i = 0; i < 11; ++i) {
-  const time = i
-  
-  const position = new THREE.Vector3(
-    (Math.random() * 2 - 1) * 2,
-    (Math.random() * 2 - 1) * 2,
-    (Math.random() * 2 - 1) * 2
-  )
-  
-  const rotation = new THREE.Euler(
-    (Math.random() * 2 - 1) * 2 * Math.PI,
-    (Math.random() * 2 - 1) * 2 * Math.PI,
-    (Math.random() * 2 - 1) * 2 * Math.PI
-  )
-  
-  const scale = new THREE.Vector3(
-    (Math.random()) + 0.5,
-    (Math.random()) + 0.5,
-    (Math.random()) + 0.5
-  )
-  
-  const keyFrame = new KeyFrame(time, position, rotation, scale)
-  sequence.addKeyFrame(keyFrame)
-}
 scene.onRaycast.add(({ object }) => {
   scene.attachToTransformControls(object)
 })
 
 (window as any).timeline = timeline
+// update current keyframe
+const keyFrame = new KeyFrame()
 
 timeline.onTimeChange.add(time => {
-  console.log(time)
-
-scene.onTransformControlsChange.add(({ position, rotation, scale }) => {
-  console.log(position)
-  console.log(rotation)
-  console.log(scale)
+  keyFrame.setTime(time)
 })
 
+scene.onTransformControlsChange.add(({ position, rotation, scale }) => {
+  keyFrame.setPosition(position)
+  keyFrame.setRotation(rotation)
+  keyFrame.setScale(scale)
+})
+
+window.addEventListener('keydown', ({ keyCode }: KeyboardEvent) => {
+  switch (keyCode) {
+    case Keys.A:
+      sequence.addKeyFrame(keyFrame.clone())
+      break
+
+    case Keys.D:
+      console.log(JSON.stringify(keyFrame, null, 2))
+      break
+  }
 })

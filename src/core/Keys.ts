@@ -1,3 +1,5 @@
+export const A = 65
+export const D = 68
 export const Q = 81
 export const SHIFT = 16
 export const W = 87
