@@ -112,7 +112,7 @@ export default class Timeline {
     this._updateProgress(offsetX)
     
     this._render()
-    this._updateSequence()
+    this._updateSequences()
   }
   
   private _handleMouseUp() {
@@ -131,7 +131,7 @@ export default class Timeline {
     this._updateProgress(offsetX)
 
     this._render()
-    this._updateSequence()
+    this._updateSequences()
   }
 
   private _handleKeyDown({ keyCode }: KeyboardEvent) {
@@ -185,10 +185,10 @@ export default class Timeline {
     
     this._updateTime()
     this._render()
-    this._updateSequence()
+    this._updateSequences()
   }
   
-  private _updateSequence() {
+  private _updateSequences() {
     if (!this._activeSequence) {
       return
     }
