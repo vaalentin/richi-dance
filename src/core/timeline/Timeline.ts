@@ -3,6 +3,7 @@ import * as THREE from 'three'
 import Sequence from './Sequence'
 import { mapValueToRange } from '../math'
 import * as Keys from '../Keys'
+import Signal from '../Signal'
 
 export const Render = {
   TICKS: 1 << 0,
@@ -35,6 +36,8 @@ export default class Timeline {
   private _clock: THREE.Clock
   private _requestAnimationFrameId: number
 
+  public onTimeChange: Signal<number>
+
   constructor($element: HTMLElement) {
     this._$element = $element
 
@@ -62,6 +65,8 @@ export default class Timeline {
 
     this._clock = new THREE.Clock()
     this._requestAnimationFrameId = null
+
+    this.onTimeChange = new Signal()
 
     this._bindMethods()
     this._addListeners()

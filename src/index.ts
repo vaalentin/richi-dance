@@ -67,3 +67,7 @@ scene.onRaycast.add(({ object }) => {
 })
 
 (window as any).timeline = timeline
+
+timeline.onTimeChange.add(time => {
+  console.log(time)
+})
