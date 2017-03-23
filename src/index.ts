@@ -47,7 +47,6 @@ scene.onRaycast.add(({ object }) => {
   scene.attachToTransformControls(object)
 })
 
-(window as any).timeline = timeline
 // update current keyframe
 const keyFrame = new KeyFrame()
 
