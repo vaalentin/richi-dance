@@ -3,9 +3,7 @@ import * as THREE from 'three'
 import 'normalize.css'
 import './index.css'
 
-import Scene, {
-  SCENE_RAYCAST
-} from './core/webgl/Scene'
+import Scene from './core/webgl/Scene'
 import KeyFrame from './core/timeline/KeyFrame'
 import Sequence from './core/timeline/Sequence'
 import Timeline from './core/timeline/Timeline'
@@ -20,9 +18,6 @@ const scene = new Scene($viewport)
 scene.start()
 scene.getCamera().position.z = 5
 
-scene.addEventListener(SCENE_RAYCAST, ({ object }: THREE.Intersection) => {
-  scene.attachToTransformControls(object)
-})
 
 const cube = new THREE.Mesh(
   new THREE.BoxGeometry(1, 1, 1),
@@ -67,5 +62,8 @@ for (let i = 0; i < 11; ++i) {
   const keyFrame = new KeyFrame(time, position, rotation, scale)
   sequence.addKeyFrame(keyFrame)
 }
+scene.onRaycast.add(({ object }) => {
+  scene.attachToTransformControls(object)
+})
 
 (window as any).timeline = timeline

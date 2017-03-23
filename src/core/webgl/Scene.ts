@@ -2,12 +2,11 @@ import * as THREE from 'three'
 import * as TransformControls from 'three-transformcontrols'
 import * as OrbitControls from 'three-orbitcontrols'
 
-import EventDispatcher from '../EventDispatcher'
+import Signal from '../Signal'
 import * as Keys from '../Keys'
 
-export const SCENE_RAYCAST = 0
 
-export default class Scene extends EventDispatcher {
+export default class Scene {
   private _$element: HTMLElement
 
   private _scene: THREE.Scene
@@ -25,9 +24,9 @@ export default class Scene extends EventDispatcher {
 
   private _requestAnimationFrameId: number;
 
-  constructor($element: HTMLElement) {
-    super()
+  public onRaycast: Signal<THREE.Intersection>
 
+  constructor($element: HTMLElement) {
     this._$element = $element
 
     const { offsetWidth: width, offsetHeight: height } = this._$element
@@ -49,6 +48,8 @@ export default class Scene extends EventDispatcher {
     this._objectsToRaycast = []
     this._raycaster = new THREE.Raycaster()
     this._mouse = new THREE.Vector2(-1, -1)
+
+    this.onRaycast = new Signal()
 
     this._bindMethods()
     this._addListeners()
@@ -162,7 +163,7 @@ export default class Scene extends EventDispatcher {
     const intersections = this._raycaster.intersectObjects(this._objectsToRaycast)
 
     for (let intersection of intersections) {
-      this.dispatchEvent(SCENE_RAYCAST, intersection)
+      this.onRaycast.dispatch(intersection)
     }
   }
 
@@ -229,7 +230,5 @@ export default class Scene extends EventDispatcher {
   public dispose() {
     this.stop()
     this._removeListeners()
-
-    super.dispose()
   }
 }
