@@ -20,9 +20,26 @@ export default class Sequence {
     this._timeline = null
   }
 
-  public addKeyFrame(keyFrame:KeyFrame) {
+  public addKeyFrame(keyFrame: KeyFrame) {
+    // look for a potential keyFrame at that time
+    // if one is found, remove it
+    let i = -1
+
+    for (let j = 0; j < this._keyFrames.length; ++j) {
+      if (this._keyFrames[j].getTime() === keyFrame.getTime()) {
+        i = j
+        break
+      }
+    }
+
+    if (i !== -1) {
+      this._keyFrames.splice(i, 1)
+    }
+    
+    // add the new keyFrame
     this._keyFrames.push(keyFrame)
 
+    // sort the keyFrames based on their time (from lower to higher)
     this._keyFrames.sort((a, b) => a.getTime() - b.getTime())
 
     if (this._timeline) {
