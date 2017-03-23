@@ -231,12 +231,12 @@ export default class Scene {
     }
   }
 
-  public attachToTransformControls(object: THREE.Object3D) {
+  public attachToTransformControls(object: THREE.Object3D|null) {
+    if (object === null) {
+      return this._transformControls.detach()
+    }
+    
     this._transformControls.attach(object)
-  }
-
-  public clearTransformControls() {
-    this._transformControls.detach()
   }
 
   public dispose() {

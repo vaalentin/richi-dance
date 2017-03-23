@@ -8,3 +8,4 @@ export const R = 82
 export const ADD = 187
 export const SUBSTRACT = 189
 export const SPACE = 32
+export const ESCAPE = 27

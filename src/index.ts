@@ -69,5 +69,9 @@ window.addEventListener('keydown', ({ keyCode }: KeyboardEvent) => {
     case Keys.D:
       console.log(JSON.stringify(keyFrame, null, 2))
       break
+
+    case Keys.ESCAPE:
+      scene.attachToTransformControls(null)
+      break
   }
 })
