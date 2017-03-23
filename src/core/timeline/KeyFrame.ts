@@ -29,16 +29,32 @@ export default class KeyFrame {
     return this._time
   }
 
+  public setTime(time: number) {
+    this._time = time
+  }
+
   public getPosition(): THREE.Vector3 {
     return this._position
+  }
+
+  public setPosition(position: THREE.Vector3) {
+    this._position.copy(position)
   }
 
   public getRotation(): THREE.Euler {
     return this._rotation
   }
 
+  public setRotation(rotation: THREE.Euler) {
+    this._rotation.copy(rotation)
+  }
+
   public getScale(): THREE.Vector3 {
     return this._scale
+  }
+
+  public setScale(scale: THREE.Vector3) {
+    this._scale.copy(scale)
   }
 
   public dispose() {
