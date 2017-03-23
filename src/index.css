@@ -24,6 +24,12 @@
   background: mediumpurple;
 }
 
+.timeline__scrubber {
+  background-color: #000;
+  width: 100%;
+  height: 50px;
+}
+
 .timeline__viewport {
   height: 100px;
   background-color: purple;
