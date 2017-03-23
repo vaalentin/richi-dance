@@ -22,7 +22,7 @@ export default class KeyFrame {
     
     this._scale = scale !== void 0
       ? scale.clone()
-      : new THREE.Vector3(0, 0, 0)
+      : new THREE.Vector3(1, 1, 1)
   }
 
   public getTime(): number {
