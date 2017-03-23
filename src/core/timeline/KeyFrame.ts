@@ -57,6 +57,10 @@ export default class KeyFrame {
     this._scale.copy(scale)
   }
 
+  public clone(): KeyFrame {
+    return new KeyFrame(this._time, this._position, this._rotation, this._scale)
+  }
+
   public dispose() {
     this._position = null
     this._rotation = null
