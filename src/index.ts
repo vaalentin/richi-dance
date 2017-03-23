@@ -70,4 +70,11 @@ scene.onRaycast.add(({ object }) => {
 
 timeline.onTimeChange.add(time => {
   console.log(time)
+
+scene.onTransformControlsChange.add(({ position, rotation, scale }) => {
+  console.log(position)
+  console.log(rotation)
+  console.log(scale)
+})
+
 })

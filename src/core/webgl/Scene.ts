@@ -5,6 +5,10 @@ import * as OrbitControls from 'three-orbitcontrols'
 import Signal from '../Signal'
 import * as Keys from '../Keys'
 
+type TransformControls = {
+  target: { object: THREE.Mesh }
+  type: string
+}
 
 export default class Scene {
   private _$element: HTMLElement
@@ -25,6 +29,7 @@ export default class Scene {
   private _requestAnimationFrameId: number;
 
   public onRaycast: Signal<THREE.Intersection>
+  public onTransformControlsChange: Signal<{ position: THREE.Vector3, rotation: THREE.Euler, scale: THREE.Vector3}>
 
   constructor($element: HTMLElement) {
     this._$element = $element
@@ -50,6 +55,7 @@ export default class Scene {
     this._mouse = new THREE.Vector2(-1, -1)
 
     this.onRaycast = new Signal()
+    this.onTransformControlsChange = new Signal()
 
     this._bindMethods()
     this._addListeners()
@@ -61,8 +67,8 @@ export default class Scene {
     this._handleMouseDown = this._handleMouseDown.bind(this)
     this._handleKeyDown = this._handleKeyDown.bind(this)
     this._handleKeyUp = this._handleKeyUp.bind(this)
+    this._handleTransformControlsChange = this._handleTransformControlsChange.bind(this)
     this._update = this._update.bind(this)
-    this._render = this._render.bind(this)
   }
 
   private _addListeners() {
@@ -71,7 +77,7 @@ export default class Scene {
     this._$element.addEventListener('mousedown', this._handleMouseDown)
     document.addEventListener('keydown', this._handleKeyDown)
     document.addEventListener('keyup', this._handleKeyUp)
-    this._transformControls.addEventListener('change', this._render)
+    this._transformControls.addEventListener('objectChange', this._handleTransformControlsChange)
   }
 
   private _removeListeners() {
@@ -80,7 +86,7 @@ export default class Scene {
     this._$element.removeEventListener('mousedown', this._handleMouseDown)
     document.removeEventListener('keydown', this._handleKeyDown)
     document.removeEventListener('keyup', this._handleKeyUp)
-    this._transformControls.removeEventListener('change', this._render)
+    this._transformControls.removeEventListener('objectChange', this._handleTransformControlsChange)
   }
 
   private _handleResize() {
@@ -151,6 +157,12 @@ export default class Scene {
 
         break
     }
+  }
+
+  private _handleTransformControlsChange({ target: { object }}: TransformControls) {
+    const { position, rotation, scale } = object
+
+    this.onTransformControlsChange.dispatch({ position, rotation, scale })
   }
 
   private _raycast() {
