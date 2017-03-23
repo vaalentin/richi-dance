@@ -41,10 +41,10 @@ const scrubber = new TimelineScrubber(timeline, $timelineScrubber)
 
 const sequence = new Sequence(cube)
 timeline.addSequence(sequence)
-timeline.setActiveSequence(sequence)
 
 scene.onRaycast.add(({ object }) => {
   scene.attachToTransformControls(object)
+  timeline.setActiveSequence(sequence)
 })
 
 // update current keyframe
@@ -72,6 +72,7 @@ window.addEventListener('keydown', ({ keyCode }: KeyboardEvent) => {
 
     case Keys.ESCAPE:
       scene.attachToTransformControls(null)
+      timeline.setActiveSequence(null)
       break
   }
 })

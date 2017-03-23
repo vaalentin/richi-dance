@@ -194,10 +194,6 @@ export default class Timeline {
   }
   
   private _updateSequences() {
-    if (!this._activeSequence) {
-      return
-    }
-    
     for (let sequence of this._sequences) {
       sequence.setTime(this._time)
     }
@@ -317,6 +313,8 @@ export default class Timeline {
       sequence.setTimeline(this)
       this._activeSequence = sequence
     }
+
+    this._render()
   }
 
   public play() {
