@@ -7,8 +7,10 @@ export default class KeyFrame {
   private _rotation: THREE.Euler
   private _scale: THREE.Vector3
 
-  constructor(time: number, position: THREE.Vector3, rotation: THREE.Euler, scale: THREE.Vector3) {
-    this._time = time
+  constructor(time?: number, position?: THREE.Vector3, rotation?: THREE.Euler, scale?: THREE.Vector3) {
+    this._time = time === void 0
+      ? -1
+      : time
     
     this._position = position !== void 0
       ? position.clone()
