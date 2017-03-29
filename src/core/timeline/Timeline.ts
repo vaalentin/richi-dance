@@ -2,7 +2,6 @@ import * as THREE from 'three'
 
 import Sequence from './Sequence'
 import { mapValueToRange } from '../math'
-import * as Keys from '../Keys'
 import Signal from '../Signal'
 
 export const Render = {
@@ -79,7 +78,6 @@ export default class Timeline {
     this._handleMouseDown = this._handleMouseDown.bind(this)
     this._handleMouseLeave = this._handleMouseLeave.bind(this)
     this._handleMouseMove = this._handleMouseMove.bind(this)
-    this._handleKeyDown = this._handleKeyDown.bind(this)
   }
 
   private _addListeners() {
@@ -88,7 +86,6 @@ export default class Timeline {
     this._$element.addEventListener('mouseleave', this._handleMouseLeave)
     this._$element.addEventListener('mousedown', this._handleMouseDown)
     this._$element.addEventListener('mouseup', this._handleMouseUp)
-    document.addEventListener('keydown', this._handleKeyDown)
   }
 
   private _removeListeners() {
@@ -97,7 +94,6 @@ export default class Timeline {
     this._$element.removeEventListener('mouseleave', this._handleMouseLeave)
     this._$element.removeEventListener('mousedown', this._handleMouseDown)
     this._$element.removeEventListener('mouseup', this._handleMouseUp)
-    document.removeEventListener('keydown', this._handleKeyDown)
   }
 
   private _handleResize() {
@@ -137,20 +133,6 @@ export default class Timeline {
 
     this._render()
     this._updateSequences()
-  }
-
-  private _handleKeyDown({ keyCode }: KeyboardEvent) {
-    switch (keyCode) {
-      case Keys.SPACE: // space
-        if (this._isPlaying) {
-          this.pause()	
-        }
-        else {
-          this.play()
-        }
-        
-        break
-    }
   }
 
   private _updateProgress(x: number) {
@@ -262,6 +244,10 @@ export default class Timeline {
     }
   }
 
+  public getBoundaries(): [number, number] {
+    return this._boundaries
+  }
+
   public setBoundaries(from: number, to: number) {
     this._boundaries[0] = from
     this._boundaries[1] = to
@@ -327,6 +313,10 @@ export default class Timeline {
     this._clock.start()
     this._requestAnimationFrameId = window.requestAnimationFrame(this._update)
   }
+
+  public isPlaying(): boolean {
+    return this._isPlaying
+  }
   
   public pause() {
     if (!this._isPlaying) {
@@ -343,8 +333,13 @@ export default class Timeline {
     this._render()
   }
 
-  public isHidden() {
-    return this._isHidden
+  public toggle() {
+    if (this._isHidden) {
+      this.show()
+    }
+    else {
+      this.hide()
+    }
   }
 
   public hide() {

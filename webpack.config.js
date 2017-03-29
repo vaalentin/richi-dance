@@ -12,7 +12,19 @@ module.exports = {
   module: {
     rules: [
       { test: /\.tsx?$/, loader: 'ts-loader' },
-      { test: /\.css$/, loader: 'style-loader!css-loader' }
+      { test: /\.css$/,
+        loaders: [
+          'style-loader',
+          {
+            loader: 'css-loader',
+            options: {
+              modules: true,
+              importLoaders: 1
+            }
+          }
+        ]
+    },
+      { test: /\.json$/, loader: 'file-loader' }
     ]
   },
   plugins: [

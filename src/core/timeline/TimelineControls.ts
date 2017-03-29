@@ -1,7 +1,18 @@
 import { createElement, appendChild } from '../../core/dom'
 import Timeline from './Timeline'
+import * as Keys from '../Keys'
 
-export default class Controls {
+export interface Presets {
+  toggled?: boolean
+  autoplay?: boolean
+  speed?: number
+  fromTime?: number
+  toTime?: number
+  enableSnap?: boolean
+  resolution?: number
+}
+
+export default class TimelineControls {
   private _timeline: Timeline
 
   private _$element: HTMLElement
@@ -17,10 +28,16 @@ export default class Controls {
   private _$snapButton: HTMLInputElement
   private _$resolution: HTMLInputElement
 
-  constructor(timeline: Timeline, $element: HTMLElement) {
+  private _isHidden: boolean
+  private _isPlaying: boolean
+
+  constructor(timeline: Timeline, $element: HTMLElement, presets?: Presets) {
     this._timeline = timeline
-    
+
     this._$element = $element
+
+    this._isHidden = false
+    this._isPlaying = false
 
     this._createElements()
     this._bindMethods()
@@ -73,7 +90,7 @@ export default class Controls {
       type: 'number',
       min: '0.1',
       max: '10',
-      value: '1'
+      value: '2'
     }) as HTMLInputElement
 
     this._$element.appendChild(this._$speedInput)
@@ -210,7 +227,21 @@ export default class Controls {
     this._timeline.setResolution(resolution)
   }
 
-  dispose() {
+  private _handleKeyDown({ keyCode }: KeyboardEvent) {
+    switch (keyCode) {
+      case Keys.SPACE: // space
+        if (this._timeline.isPlaying()) {
+          this._timeline.pause()
+        }
+        else {
+          this._timeline.play()
+        }
+        
+        break
+    }
+  }
+
+  public dispose() {
     this._removeListeners()
   }
 }

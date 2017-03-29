@@ -9,8 +9,13 @@ export default class TimelineScrubber {
   private _$canvas: HTMLCanvasElement
   private _context: CanvasRenderingContext2D
 
+  private _leftProgress: number
+  private _rightProgress: number
+
   private _boundaries: [number, number]
   private _boundariesInView: [number, number]
+
+  private _isMouseDown: boolean
 
   constructor(timeline: Timeline, $element: HTMLElement) {
     this._timeline = timeline
@@ -24,8 +29,13 @@ export default class TimelineScrubber {
 
     this._$element.appendChild(this._$canvas)
 
+    this._leftProgress = 0
+    this._rightProgress = 0
+
     this._boundaries = this._timeline.getBoundaries()
     this._boundariesInView = this._boundaries
+
+    this._isMouseDown = false
 
     this._bindMethods()
     this._addListeners()
@@ -60,12 +70,21 @@ export default class TimelineScrubber {
   }
 
   private _handleMouseDown({ offsetX }: MouseEvent) {
+    this._isMouseDown = true
+
+    const progress = offsetX / this._$canvas.width
   }
 
   private _handleMouseMove({ offsetX }: MouseEvent) {
+    if (!this._isMouseDown) {
+      return
+    }
+
+    const progress = offsetX / this._$canvas.width
   }
 
   private _handleMouseUp({ offsetX }: MouseEvent) {
+    this._isMouseDown = false
   }
 
   private _render() {

@@ -1,0 +1,14 @@
+.loader {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: black;
+}
+
+.title {
+  composes: title from '../../shared.css';
+  margin: 0;
+  padding: 0;
+}

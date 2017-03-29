@@ -2,7 +2,11 @@ export function createElement(type: string, className?: string, attributes?: {[k
   const $element = document.createElement(type)
 
   if (className) {
-    $element.classList.add(className)
+    const classes = className.split(' ')
+
+    for (let c of classes) {
+      $element.classList.add(c)
+    }
   }
 
   if (attributes) {
