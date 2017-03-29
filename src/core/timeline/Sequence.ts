@@ -6,14 +6,14 @@ import KeyFrame from './KeyFrame'
 import { mapValueToRange } from '../math'
 
 export default class Sequence {
-  private _element: THREE.Object3D
+  private _object: THREE.Object3D
 
   private _keyFrames: KeyFrame[]
 
   private _timeline: Timeline
 
-  constructor(element: THREE.Object3D) {
-    this._element = element
+  constructor(object: THREE.Object3D) {
+    this._object = object
 
     this._keyFrames = []
 
@@ -90,13 +90,13 @@ export default class Sequence {
           progress
         )
         
-        this._element.position.copy(position)
+        this._object.position.copy(position)
         
         const rotation = new THREE.Quaternion().setFromEuler(currentKeyFrame.getRotation())
           .slerp(new THREE.Quaternion().setFromEuler(nextKeyFrame.getRotation()), progress)
           .normalize()
         
-        this._element.rotation.setFromQuaternion(rotation)
+        this._object.rotation.setFromQuaternion(rotation)
         
         const scale = new THREE.Vector3().lerpVectors(
           currentKeyFrame.getScale(),
@@ -104,7 +104,7 @@ export default class Sequence {
           progress
         )
         
-        this._element.scale.copy(scale)
+        this._object.scale.copy(scale)
       }
     }
   }
