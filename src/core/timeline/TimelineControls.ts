@@ -84,7 +84,7 @@ export default class Controls {
     this._$snapButton.addEventListener('click', this._handleSnap)
     this._$snapResolutionInput.addEventListener('input', this._handleSnapResolution)
 
-    this._timeline.onPlayPauseChange.add(this._updatePlayPause)
+    this._timeline.onPause.add(this._updatePlayPause)
 
     document.addEventListener('keydown', this._handleKeyDown)
   }
@@ -99,7 +99,7 @@ export default class Controls {
     this._$snapButton.removeEventListener('click', this._handleSnap)
     this._$snapResolutionInput.removeEventListener('input', this._handleSnapResolution)
 
-    this._timeline.onPlayPauseChange.remove(this._updatePlayPause)
+    this._timeline.onPause.remove(this._updatePlayPause)
 
     document.removeEventListener('keydown', this._handleKeyDown)
   }

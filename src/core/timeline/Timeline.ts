@@ -45,7 +45,7 @@ export default class Timeline {
   private _requestAnimationFrameId: number
 
   public onTimeChange: Signal<number>
-  public onPlayPauseChange: Signal<boolean>
+  public onPause: Signal<void>
 
   constructor($element: HTMLElement, options: TimelineOptions = new TimelineOptions()) {
     this._$element = $element
@@ -76,7 +76,7 @@ export default class Timeline {
     this._requestAnimationFrameId = null
 
     this.onTimeChange = new Signal()
-    this.onPlayPauseChange = new Signal()
+    this.onPause = new Signal<void>()
 
     this._bindMethods()
     this._addListeners()
@@ -118,6 +118,7 @@ export default class Timeline {
     this._isMouseDown = true
     
     if (this._isPlaying) {
+      this.onPause.dispatch()
       this.pause()
     }
     
@@ -312,8 +313,6 @@ export default class Timeline {
     }
 
     this._isPlaying = true
-
-    this.onPlayPauseChange.dispatch(true)
     
     this._clock.start()
     this._requestAnimationFrameId = window.requestAnimationFrame(this._update)
@@ -325,8 +324,6 @@ export default class Timeline {
     }
     
     this._isPlaying = false
-
-    this.onPlayPauseChange.dispatch(false)
     
     this._clock.stop()
     window.cancelAnimationFrame(this._requestAnimationFrameId)
