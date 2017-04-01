@@ -175,8 +175,11 @@ export default class Timeline {
     
     this._progress += progressDelta
     
-    if (this._progress >= 1) {
-      this._progress -= 1
+    if (this._progress < 0) {
+      this._progress += 1 - this._progress
+    }
+    else if (this._progress > 1) {
+      this._progress -= this._progress
     }
     
     this._updateTime()
