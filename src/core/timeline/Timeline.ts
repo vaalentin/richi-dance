@@ -11,6 +11,14 @@ export const Render = {
   KEYFRAMES: 1 << 2
 }
 
+export class TimelineOptions {
+  public boundaries: [number, number] = [0, 10]
+  public speed = 1
+  public snap = true
+  public snapResolution = 4
+  public renderMask = Render.TICKS | Render.CURSOR | Render.KEYFRAMES
+}
+
 export default class Timeline {
   private _$element: HTMLElement
 
@@ -38,7 +46,7 @@ export default class Timeline {
 
   public onTimeChange: Signal<number>
 
-  constructor($element: HTMLElement) {
+  constructor($element: HTMLElement, options: TimelineOptions = new TimelineOptions()) {
     this._$element = $element
 
     this._$canvas = document.createElement('canvas')
@@ -48,17 +56,17 @@ export default class Timeline {
 
     this._$element.appendChild(this._$canvas)
 
-    this._boundaries = [0, 0]
+    this._boundaries = options.boundaries
     this._progress = 0
-    this._speed = 1
-    this._snapResolution = 1
+    this._speed = options.speed
+    this._snapResolution = options.snapResolution
 
     this._isPlaying = false
     this._isMouseDown = false
     this._isHidden = false
-    this._isSnapEnabled = false
+    this._isSnapEnabled = options.snap
 
-    this._renderMask = Render.TICKS | Render.KEYFRAMES | Render.CURSOR
+    this._renderMask = options.renderMask
 
     this._sequences = []
     this._activeSequence = null
