@@ -87,7 +87,6 @@ export default class Timeline {
     this._handleMouseDown = this._handleMouseDown.bind(this)
     this._handleMouseLeave = this._handleMouseLeave.bind(this)
     this._handleMouseMove = this._handleMouseMove.bind(this)
-    this._handleKeyDown = this._handleKeyDown.bind(this)
   }
 
   private _addListeners() {
@@ -96,7 +95,6 @@ export default class Timeline {
     this._$element.addEventListener('mouseleave', this._handleMouseLeave)
     this._$element.addEventListener('mousedown', this._handleMouseDown)
     this._$element.addEventListener('mouseup', this._handleMouseUp)
-    document.addEventListener('keydown', this._handleKeyDown)
   }
 
   private _removeListeners() {
@@ -105,7 +103,6 @@ export default class Timeline {
     this._$element.removeEventListener('mouseleave', this._handleMouseLeave)
     this._$element.removeEventListener('mousedown', this._handleMouseDown)
     this._$element.removeEventListener('mouseup', this._handleMouseUp)
-    document.removeEventListener('keydown', this._handleKeyDown)
   }
 
   private _handleResize() {
@@ -145,20 +142,6 @@ export default class Timeline {
 
     this._render()
     this._updateSequences()
-  }
-
-  private _handleKeyDown({ keyCode }: KeyboardEvent) {
-    switch (keyCode) {
-      case Keys.SPACE: // space
-        if (this._isPlaying) {
-          this.pause()	
-        }
-        else {
-          this.play()
-        }
-        
-        break
-    }
   }
 
   private _updateProgress(x: number) {
