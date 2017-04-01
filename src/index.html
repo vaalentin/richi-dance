@@ -22,7 +22,16 @@
     <div class="viewport"></div>
     <div class="timeline">
       <div class="timeline__scrubber"></div>
-      <div class="timeline__controls"></div>
+      <div class="timeline__controls">
+        <input type="button" class="controls__toggle" value="Hide"/>
+        <input type="button" class="controls__clear" value="Clear"/>
+        <input type="button" class="controls__play-pause" value="Play"/>
+        <input type="number" class="controls__speed" value="1" min="-10" max="10"/>
+        <input type="number" class="controls__boundaries-from" value="0" min="0" max="100"/>
+        <input type="number" class="controls__boundaries-to" value="10" min="0" max="100"/>
+        <input type="button" class="controls__snap" value="Enable Snap"/>
+        <input type="number" class="controls__snap-resolution" value="1" min="1" max="10"/>
+      </div>
       <div class="timeline__viewport"></div>
     </div>
   </div>

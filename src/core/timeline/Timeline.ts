@@ -31,9 +31,9 @@ export default class Timeline {
   private _speed: number
   private _snapResolution: number
 
+  private _isHidden: boolean
   private _isPlaying: boolean
   private _isMouseDown: boolean
-  private _isHidden: boolean
   private _isSnapEnabled: boolean
 
   private _renderMask: number
@@ -45,6 +45,7 @@ export default class Timeline {
   private _requestAnimationFrameId: number
 
   public onTimeChange: Signal<number>
+  public onPlayPauseChange: Signal<boolean>
 
   constructor($element: HTMLElement, options: TimelineOptions = new TimelineOptions()) {
     this._$element = $element
@@ -61,9 +62,9 @@ export default class Timeline {
     this._speed = options.speed
     this._snapResolution = options.snapResolution
 
+    this._isHidden = false
     this._isPlaying = false
     this._isMouseDown = false
-    this._isHidden = false
     this._isSnapEnabled = options.snap
 
     this._renderMask = options.renderMask
@@ -75,6 +76,7 @@ export default class Timeline {
     this._requestAnimationFrameId = null
 
     this.onTimeChange = new Signal()
+    this.onPlayPauseChange = new Signal()
 
     this._bindMethods()
     this._addListeners()
@@ -256,17 +258,6 @@ export default class Timeline {
     }
   }
 
-  public setBoundaries(from: number, to: number) {
-    this._boundaries[0] = from
-    this._boundaries[1] = to
-    
-    this._render()
-  }
-
-  public setSpeed(speed: number) {
-    this._speed = speed
-  }
-
   public addSequence(sequence: Sequence) {
     const i = this._sequences.indexOf(sequence)
 
@@ -311,12 +302,18 @@ export default class Timeline {
     this._render()
   }
 
+  public isPlaying() {
+    return this._isPlaying
+  }
+
   public play() {
     if (this._isPlaying) {
       return
     }
 
     this._isPlaying = true
+
+    this.onPlayPauseChange.dispatch(true)
     
     this._clock.start()
     this._requestAnimationFrameId = window.requestAnimationFrame(this._update)
@@ -328,6 +325,8 @@ export default class Timeline {
     }
     
     this._isPlaying = false
+
+    this.onPlayPauseChange.dispatch(false)
     
     this._clock.stop()
     window.cancelAnimationFrame(this._requestAnimationFrameId)
@@ -342,47 +341,74 @@ export default class Timeline {
   }
 
   public hide() {
-    if (this._isHidden) {
-      return
-    }
-
     this._isHidden = true
 
     this._$element.style.display = 'none'
   }
 
   public show() {
-    if (!this._isHidden) {
-      return
-    }
-
     this._isHidden = false
 
     this._$element.style.display = 'block'
   }
 
-  public toggleSnap() {
-    this._isSnapEnabled = !this._isSnapEnabled
+  public getSpeed(): number {
+    return this._speed
+  }
 
+  public setSpeed(speed: number) {
+    this._speed = speed
+  }
+
+  public getBoundaries(): [number, number] {
+    return this._boundaries
+  }
+
+  public setBoundaries(from: number, to: number) {
+    this._boundaries[0] = from
+    this._boundaries[1] = to
+    
     if (this._isSnapEnabled) {
       this._snapProgress()
     }
-
+    
     this._render()
   }
 
-  public setResolution(resolution: number) {
+  public isSnapEnabled(): boolean {
+    return this._isSnapEnabled
+  }
+
+  public setSnap(snap: boolean) {
+    this._isSnapEnabled = snap
+
+    if (this._isSnapEnabled) {
+      this._snapProgress()
+      this._render()
+    }
+  }
+
+  public getSnapResolution(): number {
+    return this._snapResolution
+  }
+
+  public setSnapResolution(resolution: number) {
     this._snapResolution = resolution
 
     if (this._isSnapEnabled) {
       this._snapProgress()
+      this._render()
     }
+  }
 
-    this._render()
+  public getRenderMask(): number {
+    return this._renderMask
   }
 
   public setRenderMask(mask: number) {
     this._renderMask = mask
+
+    this._render()
   }
 
   public dispose() {
