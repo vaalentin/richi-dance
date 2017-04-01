@@ -7,6 +7,7 @@
   "license": "MIT",
   "devDependencies": {
     "@types/three": "^0.84.2",
+    "extract-text-webpack-plugin": "^2.1.0",
     "html-webpack-plugin": "^2.28.0",
     "ts-loader": "^2.0.2",
     "typescript": "^2.2.1",
@@ -15,6 +16,8 @@
   },
   "scripts": {
     "start": "webpack-dev-server --config webpack.dev.config.js",
+    "clean": "rm -rf dist",
+    "build": "npm run clean && webpack --config webpack.prod.config.js --progress"
   },
   "dependencies": {
     "css-loader": "^0.27.3",
