@@ -9,3 +9,5 @@ export const ADD = 187
 export const SUBSTRACT = 189
 export const SPACE = 32
 export const ESCAPE = 27
+export const ENTER = 13
+export const QUESTION_MARK = 191

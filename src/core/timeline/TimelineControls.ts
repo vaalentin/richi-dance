@@ -17,9 +17,15 @@ export default class Controls {
   private _$snapResolutionInput: HTMLInputElement
 
   constructor(timeline: Timeline, $element: HTMLElement) {
+  private _$help: HTMLElement
+
+  private _isHelpOpen: boolean
     this._timeline = timeline
 
     this._$element = $element
+    this._$help = document.querySelector('.help') as HTMLElement
+
+    this._isHelpOpen = false
 
     this._getElements()
     this._setInitialState()
@@ -177,13 +183,47 @@ export default class Controls {
     this._timeline.setSnapResolution(parseInt(this._$snapResolutionInput.value))
   }
 
-  private _handleKeyDown({ keyCode }: KeyboardEvent) {
+  private _handleKeyDown({ keyCode, shiftKey }: KeyboardEvent) {
     switch (keyCode) {
       case Keys.SPACE:
         this._handlePlayPause()
         
         break
+
+      case Keys.QUESTION_MARK:
+        if (shiftKey && !this._isHelpOpen) {
+          this._openHelp()
+        }
+
+        break
+
+      case Keys.ESCAPE:
+        if (this._isHelpOpen) {
+          this._closeHelp()
+        }
+        
+        break
     }
+  }
+
+  private _openHelp() {
+    if (this._isHelpOpen) {
+      return
+    }
+
+    this._isHelpOpen = true
+
+    this._$help.style.display = 'block'
+  }
+
+  private _closeHelp() {
+    if (!this._isHelpOpen) {
+      return
+    }
+
+    this._isHelpOpen = false
+
+    this._$help.style.display = 'none'
   }
 
   public dispose() {
