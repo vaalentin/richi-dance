@@ -14,8 +14,6 @@ import TimelineScrubber from './core/timeline/TimelineScrubber'
 
 const $app = document.querySelector('.app') as HTMLElement
 const $viewport = $app.querySelector('.viewport') as HTMLElement
-const $timelineControls = $app.querySelector('.timeline__controls') as HTMLElement
-const $timelineViewport = $app.querySelector('.timeline__viewport') as HTMLElement
 const $timelineScrubber = $app.querySelector('.timeline__scrubber') as HTMLElement
 
 const scene = new Scene($viewport)
@@ -33,11 +31,11 @@ const cube = new THREE.Mesh(
 scene.addToRaycast(cube)
 scene.add(cube)
 
-const timeline = new Timeline($timelineViewport)
+const timeline = new Timeline()
 timeline.setBoundaries(0, 10)
 
-const controls = new TimelineControls(timeline, $timelineControls)
 const scrubber = new TimelineScrubber(timeline, $timelineScrubber)
+const controls = new TimelineControls(timeline)
 
 const sequence = new Sequence(cube)
 timeline.addSequence(sequence)

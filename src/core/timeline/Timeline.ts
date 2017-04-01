@@ -47,8 +47,8 @@ export default class Timeline {
   public onTimeChange: Signal<number>
   public onPause: Signal<void>
 
-  constructor($element: HTMLElement, options: TimelineOptions = new TimelineOptions()) {
-    this._$element = $element
+  constructor(options: TimelineOptions = new TimelineOptions()) {
+    this._$element = document.querySelector('.timeline__viewport') as HTMLElement
 
     this._$canvas = document.createElement('canvas')
     this._$canvas.width = this._$element.offsetWidth

@@ -5,8 +5,6 @@ import * as Keys from '../Keys'
 export default class Controls {
   private _timeline: Timeline
 
-  private _$element: HTMLElement
-
   private _$toggleButton: HTMLInputElement
   private _$clearButton: HTMLInputElement
   private _$playPauseButton: HTMLInputElement
@@ -16,32 +14,31 @@ export default class Controls {
   private _$snapButton: HTMLInputElement
   private _$snapResolutionInput: HTMLInputElement
 
-  constructor(timeline: Timeline, $element: HTMLElement) {
   private _$help: HTMLElement
 
   private _isHelpOpen: boolean
+
+  constructor(timeline: Timeline) {
     this._timeline = timeline
 
-    this._$element = $element
+    const $controls = document.querySelector('.timeline__controls')
+
+    this._$toggleButton = $controls.querySelector('.controls__toggle') as HTMLInputElement
+    this._$clearButton = $controls.querySelector('.controls__clear') as HTMLInputElement
+    this._$playPauseButton = $controls.querySelector('.controls__play-pause') as HTMLInputElement
+    this._$speedInput = $controls.querySelector('.controls__speed') as HTMLInputElement
+    this._$boundariesFromInput = $controls.querySelector('.controls__boundaries-from') as HTMLInputElement
+    this._$boundariesToInput = $controls.querySelector('.controls__boundaries-to') as HTMLInputElement
+    this._$snapButton = $controls.querySelector('.controls__snap') as HTMLInputElement
+    this._$snapResolutionInput = $controls.querySelector('.controls__snap-resolution') as HTMLInputElement
+
     this._$help = document.querySelector('.help') as HTMLElement
 
     this._isHelpOpen = false
 
-    this._getElements()
     this._setInitialState()
     this._bindMethods()
     this._addListeners()
-  }
-
-  private _getElements() {
-    this._$toggleButton = this._$element.querySelector('.controls__toggle') as HTMLInputElement
-    this._$clearButton = this._$element.querySelector('.controls__clear') as HTMLInputElement
-    this._$playPauseButton = this._$element.querySelector('.controls__play-pause') as HTMLInputElement
-    this._$speedInput = this._$element.querySelector('.controls__speed') as HTMLInputElement
-    this._$boundariesFromInput = this._$element.querySelector('.controls__boundaries-from') as HTMLInputElement
-    this._$boundariesToInput = this._$element.querySelector('.controls__boundaries-to') as HTMLInputElement
-    this._$snapButton = this._$element.querySelector('.controls__snap') as HTMLInputElement
-    this._$snapResolutionInput = this._$element.querySelector('.controls__snap-resolution') as HTMLInputElement
   }
 
   private _setInitialState() {
