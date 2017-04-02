@@ -77,6 +77,7 @@ export default class Sequence {
     }
 
     if (i !== -1) {
+      this._keyFrames[i].dispose()
       this._keyFrames.splice(i, 1)
     }
     
