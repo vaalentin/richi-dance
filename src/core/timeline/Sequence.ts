@@ -42,6 +42,20 @@ export default class Sequence {
     // sort the keyFrames based on their time (from lower to higher)
     this._keyFrames.sort((a, b) => a.getTime() - b.getTime())
 
+    // update hasPosition, hasRotation and hasScale for every keyFrames.
+    for (let i = 0; i < this._keyFrames.length; ++i) {
+      const currentKeyFrame = this._keyFrames[i]
+      const nextKeyFrame = this._keyFrames[(i + 1) % this._keyFrames.length]
+
+      const hasPosition = !currentKeyFrame.getPosition().equals(nextKeyFrame.getPosition())
+      const hasRotation = !currentKeyFrame.getRotation().equals(nextKeyFrame.getRotation())
+      const hasScale = !currentKeyFrame.getScale().equals(nextKeyFrame.getScale())
+
+      currentKeyFrame.hasPosition(hasPosition)
+      currentKeyFrame.hasRotation(hasRotation)
+      currentKeyFrame.hasScale(hasScale)
+    }
+
     if (this._timeline) {
       this._timeline.forceRender()
     }

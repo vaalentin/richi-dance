@@ -7,6 +7,10 @@ export default class KeyFrame {
   private _rotation: THREE.Euler
   private _scale: THREE.Vector3
 
+  private _hasPosition: boolean
+  private _hasRotation: boolean
+  private _hasScale: boolean
+
   constructor(time?: number, position?: THREE.Vector3, rotation?: THREE.Euler, scale?: THREE.Vector3) {
     this._time = time === void 0
       ? -1
@@ -23,6 +27,10 @@ export default class KeyFrame {
     this._scale = scale !== void 0
       ? scale.clone()
       : new THREE.Vector3(1, 1, 1)
+
+    this._hasPosition = false
+    this._hasRotation = false
+    this._hasScale = false
   }
 
   public getTime(): number {
@@ -59,6 +67,30 @@ export default class KeyFrame {
 
   public clone(): KeyFrame {
     return new KeyFrame(this._time, this._position, this._rotation, this._scale)
+  }
+
+  public hasPosition(value?: boolean) {
+    if (value === void 0) {
+      return this._hasPosition
+    }
+
+    this._hasPosition = value
+  }
+
+  public hasRotation(value?: boolean) {
+    if (value === void 0) {
+      return this._hasRotation
+    }
+
+    this._hasRotation = value
+  }
+
+  public hasScale(value?: boolean) {
+    if (value === void 0) {
+      return this._hasScale
+    }
+
+    this._hasScale = value
   }
 
   public dispose() {
