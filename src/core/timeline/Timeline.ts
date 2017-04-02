@@ -16,6 +16,8 @@ enum State {
   NONE,
   CURSOR,
   KEYFRAME,
+  KEYFRAME_MOVE,
+  KEYFRAME_SELECTED,
   PLAYING
 }
 
@@ -50,7 +52,6 @@ export default class Timeline {
   private _sequences: Sequence[]
   private _activeSequence: Sequence
 
-  private _isMovingSelectedKeyFrame: boolean
   private _selectedKeyFrame: KeyFrame
   private _selectionDistance: number
   private _state: State
@@ -86,7 +87,6 @@ export default class Timeline {
     this._sequences = []
     this._activeSequence = null
 
-    this._isMovingSelectedKeyFrame = false
     this._selectedKeyFrame = null
     this._selectionDistance = options.keyFrameSelectionDistance
     this._state = State.NONE
@@ -106,14 +106,13 @@ export default class Timeline {
     this._handleResize = this._handleResize.bind(this)
     this._handleMouseUp = this._handleMouseUp.bind(this)
     this._handleMouseDown = this._handleMouseDown.bind(this)
-    this._handleMouseLeave = this._handleMouseLeave.bind(this)
     this._handleMouseMove = this._handleMouseMove.bind(this)
   }
 
   private _addListeners() {
     window.addEventListener('resize', this._handleResize)
     this._$element.addEventListener('mousemove', this._handleMouseMove)
-    this._$element.addEventListener('mouseleave', this._handleMouseLeave)
+    this._$element.addEventListener('mouseleave', this._handleMouseUp)
     this._$element.addEventListener('mousedown', this._handleMouseDown)
     this._$element.addEventListener('mouseup', this._handleMouseUp)
   }
@@ -121,7 +120,7 @@ export default class Timeline {
   private _removeListeners() {
     window.removeEventListener('resize', this._handleResize)
     this._$element.removeEventListener('mousemove', this._handleMouseMove)
-    this._$element.removeEventListener('mouseleave', this._handleMouseLeave)
+    this._$element.removeEventListener('mouseleave', this._handleMouseUp)
     this._$element.removeEventListener('mousedown', this._handleMouseDown)
     this._$element.removeEventListener('mouseup', this._handleMouseUp)
   }
@@ -137,6 +136,14 @@ export default class Timeline {
     this._isMouseDown = true
 
     switch (this._state) {
+      case State.KEYFRAME_SELECTED: {
+        this._state = State.NONE
+
+        this._selectedKeyFrame = this._getSelectedKeyFrame(offsetX)
+
+        // let it flow through to know if we selected a new key frame
+      }
+
       case State.NONE: {
         if (this._selectedKeyFrame) {
           this._state = State.KEYFRAME
@@ -171,20 +178,16 @@ export default class Timeline {
     this._isMouseDown = false
 
     switch (this._state) {
-      case State.KEYFRAME:
-      case State.CURSOR: {
-        this._state = State.NONE
+      // mouse up was called before mouse move
+      // we have selected a keyframe, we don't wish to move it
+      case State.KEYFRAME: {
+        this._state = State.KEYFRAME_SELECTED
+        console.log('key frame selected')
 
         break
       }
-    }
-  }
 
-  private _handleMouseLeave() {
-    this._isMouseDown = false
-
-    switch (this._state) {
-      case State.KEYFRAME:
+      case State.KEYFRAME_MOVE:
       case State.CURSOR: {
         this._state = State.NONE
 
@@ -196,36 +199,21 @@ export default class Timeline {
   private _handleMouseMove({ offsetX }: MouseEvent) {
     switch (this._state) {
       case State.NONE: {
-        const progress = this._getProgress(offsetX)
-        const time = this._getTime(progress)
-
-        // select keyFrame
-        if (this._activeSequence) {
-          const keyFrames = this._activeSequence.getKeyFrames()
-
-          let selectedKeyFrameFound = false
-
-          for (let keyFrame of keyFrames) {
-            const delta = Math.abs(time - keyFrame.getTime())
-            
-            if (delta < this._selectionDistance) {
-              selectedKeyFrameFound = true
-              this._selectedKeyFrame = keyFrame
-              break
-            }
-          }
-
-          if (!selectedKeyFrameFound) {
-            this._selectedKeyFrame = null
-          }
-
-          this._render()
-        }
+        this._selectedKeyFrame = this._getSelectedKeyFrame(offsetX)
+        this._render()
 
         break
       }
 
+      // moved before mouseup was called
+      // we are now moving the keyframe, not selecting it
       case State.KEYFRAME: {
+        this._state = State.KEYFRAME_MOVE
+
+        // let if flow through to start moving
+      }
+
+      case State.KEYFRAME_MOVE: {
         const progress = this._getProgress(offsetX)
         const time = this._getTime(progress)
 
@@ -245,6 +233,34 @@ export default class Timeline {
         this._updateSequences()
 
         break
+      }
+    }
+  }
+
+  private _getSelectedKeyFrame(x: number): KeyFrame|null {
+    const progress = this._getProgress(x)
+    const time = this._getTime(progress)
+
+    // select keyFrame
+    if (this._activeSequence) {
+      const keyFrames = this._activeSequence.getKeyFrames()
+
+      let selectedKeyFrame: KeyFrame = null
+
+      for (let keyFrame of keyFrames) {
+        const delta = Math.abs(time - keyFrame.getTime())
+
+        if (delta < this._selectionDistance) {
+          selectedKeyFrame = keyFrame
+          break
+        }
+      }
+
+      if (!selectedKeyFrame) {
+        return null
+      }
+      else {
+        return selectedKeyFrame
       }
     }
   }
