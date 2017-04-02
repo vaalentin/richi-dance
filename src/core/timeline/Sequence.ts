@@ -2,22 +2,66 @@ import * as THREE from 'three'
 
 import Timeline from './Timeline'
 import KeyFrame from './KeyFrame'
-
+import Signal from '../Signal'
 import { mapValueToRange } from '../math'
 
 export default class Sequence {
-  private _object: THREE.Object3D
+  private _element: THREE.Object3D
 
   private _keyFrames: KeyFrame[]
 
   private _timeline: Timeline
 
+  public onUpdate: Signal<{ position: THREE.Vector3, rotation: THREE.Euler, scale: THREE.Vector3 }>
+
   constructor(object: THREE.Object3D) {
-    this._object = object
+    this._element = object
 
     this._keyFrames = []
 
     this._timeline = null
+
+    this.onUpdate = new Signal()
+  }
+
+  public update(time:number) {
+    for (let i = 0; i < this._keyFrames.length - 1; ++i) {
+      const currentKeyFrame = this._keyFrames[i]
+      const nextKeyFrame = this._keyFrames[i + 1]
+
+      if (time >= currentKeyFrame.getTime() && time <= nextKeyFrame.getTime()) {
+        // that's where we're at, in between those 2 keyframes
+        
+        // get progress, value from 0 to 1 between the 2 frames
+        const progress = mapValueToRange(time, currentKeyFrame.getTime(), nextKeyFrame.getTime(), 0, 1)
+        
+        const position = new THREE.Vector3().lerpVectors(
+          currentKeyFrame.getPosition(),
+          nextKeyFrame.getPosition(),
+          progress
+        )
+        
+        this._element.position.copy(position)
+        
+        const quaternion = new THREE.Quaternion().setFromEuler(currentKeyFrame.getRotation())
+          .slerp(new THREE.Quaternion().setFromEuler(nextKeyFrame.getRotation()), progress)
+          .normalize()
+
+        const rotation = new THREE.Euler().setFromQuaternion(quaternion)
+        
+        this._element.rotation.copy(rotation)
+        
+        const scale = new THREE.Vector3().lerpVectors(
+          currentKeyFrame.getScale(),
+          nextKeyFrame.getScale(),
+          progress
+        )
+        
+        this._element.scale.copy(scale)
+
+        this.onUpdate.dispatch({ position, rotation, scale })
+      }
+    }
   }
 
   public addKeyFrame(keyFrame: KeyFrame) {
@@ -75,6 +119,10 @@ export default class Sequence {
     }
   }
 
+  public getKeyFrames(): KeyFrame[] {
+    return this._keyFrames
+  }
+
   public clear() {
     this._keyFrames.length = 0
 
@@ -83,48 +131,20 @@ export default class Sequence {
     }
   }
 
+  public getTimeline(): Timeline {
+    return this._timeline
+  }
+
   public setTimeline(timeline: Timeline|null) {
     this._timeline = timeline
   }
 
-  public setTime(time:number) {
-    for (let i = 0; i < this._keyFrames.length - 1; ++i) {
-      const currentKeyFrame = this._keyFrames[i]
-      const nextKeyFrame = this._keyFrames[i + 1]
-      
-      if (time >= currentKeyFrame.getTime() && time <= nextKeyFrame.getTime()) {
-        // that's where we're at, in between those 2 keyframes
-        
-        // get progress, value from 0 to 1 between the 2 frames
-        const progress = mapValueToRange(time, currentKeyFrame.getTime(), nextKeyFrame.getTime(), 0, 1)
-        
-        const position = new THREE.Vector3().lerpVectors(
-          currentKeyFrame.getPosition(),
-          nextKeyFrame.getPosition(),
-          progress
-        )
-        
-        this._object.position.copy(position)
-        
-        const rotation = new THREE.Quaternion().setFromEuler(currentKeyFrame.getRotation())
-          .slerp(new THREE.Quaternion().setFromEuler(nextKeyFrame.getRotation()), progress)
-          .normalize()
-        
-        this._object.rotation.setFromQuaternion(rotation)
-        
-        const scale = new THREE.Vector3().lerpVectors(
-          currentKeyFrame.getScale(),
-          nextKeyFrame.getScale(),
-          progress
-        )
-        
-        this._object.scale.copy(scale)
-      }
-    }
+  public getElement(): THREE.Object3D {
+    return this._element
   }
 
-  public getKeyFrames():KeyFrame[] {
-    return this._keyFrames
+  public setElement(element: THREE.Object3D) {
+    this._element = element
   }
 
   public dispose() {

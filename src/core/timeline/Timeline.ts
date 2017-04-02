@@ -192,7 +192,7 @@ export default class Timeline {
   
   private _updateSequences() {
     for (let sequence of this._sequences) {
-      sequence.setTime(this._time)
+      sequence.update(this._time)
     }
   }
 
