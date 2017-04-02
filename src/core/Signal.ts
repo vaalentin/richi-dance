@@ -5,7 +5,7 @@ export default class Signal<T> {
     this._listeners = []
   }
 
-  public add(listener?: (data: T) => void) {
+  public add(listener: (data?: T) => void) {
     const i = this._listeners.indexOf(listener)
 
     if (i !== -1) {
@@ -15,7 +15,7 @@ export default class Signal<T> {
     this._listeners.push(listener)
   }
 
-  public remove(listener?: (data: T) => void) {
+  public remove(listener: (data?: T) => void) {
     const i = this._listeners.indexOf(listener)
 
     if (i === -1) {
