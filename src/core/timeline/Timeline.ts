@@ -12,6 +12,13 @@ export const Render = {
   KEYFRAMES: 1 << 2
 }
 
+enum State {
+  NONE,
+  CURSOR,
+  KEYFRAME,
+  PLAYING
+}
+
 export class TimelineOptions {
   public boundaries: [number, number] = [0, 10]
   public speed = 1
@@ -46,6 +53,7 @@ export default class Timeline {
   private _isMovingSelectedKeyFrame: boolean
   private _selectedKeyFrame: KeyFrame
   private _selectionDistance: number
+  private _state: State
 
   private _clock: THREE.Clock
   private _requestAnimationFrameId: number
@@ -81,6 +89,7 @@ export default class Timeline {
     this._isMovingSelectedKeyFrame = false
     this._selectedKeyFrame = null
     this._selectionDistance = options.keyFrameSelectionDistance
+    this._state = State.NONE
 
     this._clock = new THREE.Clock()
     this._requestAnimationFrameId = null
@@ -126,108 +135,146 @@ export default class Timeline {
 
   private _handleMouseDown({ offsetX }: MouseEvent) {
     this._isMouseDown = true
-    
-    if (this._isPlaying) {
-      this.onPause.dispatch()
-      this.pause()
-    }
 
-    if (this._selectedKeyFrame) {
-      this._isMovingSelectedKeyFrame = true
-      return
+    switch (this._state) {
+      case State.NONE: {
+        if (this._selectedKeyFrame) {
+          this._state = State.KEYFRAME
+
+          this._render()
+        }
+        else {
+          this._state = State.CURSOR
+
+          this._updateProgress(offsetX)
+          this._render()
+          this._updateSequences()
+        }
+
+        break
+      }
+
+      case State.PLAYING: {
+        this.onPause.dispatch()
+        this.pause()
+
+        this._updateProgress(offsetX)
+        this._render()
+        this._updateSequences()
+
+        break
+      }
     }
-    
-    this._updateProgress(offsetX)
-    
-    this._render()
-    this._updateSequences()
   }
   
   private _handleMouseUp() {
-    if (this._isMovingSelectedKeyFrame) {
-      this._isMovingSelectedKeyFrame = false
-    }
-
     this._isMouseDown = false
+
+    switch (this._state) {
+      case State.KEYFRAME:
+      case State.CURSOR: {
+        this._state = State.NONE
+
+        break
+      }
+    }
   }
 
   private _handleMouseLeave() {
-    if (this._isMovingSelectedKeyFrame) {
-      this._isMovingSelectedKeyFrame = false
-    }
-
     this._isMouseDown = false
+
+    switch (this._state) {
+      case State.KEYFRAME:
+      case State.CURSOR: {
+        this._state = State.NONE
+
+        break
+      }
+    }
   }
 
   private _handleMouseMove({ offsetX }: MouseEvent) {
-    if (this._isMovingSelectedKeyFrame) {
-      const progress = offsetX / this._$canvas.width
-      const time = (progress * (this._boundaries[1] - this._boundaries[0])) + this._boundaries[0]
+    switch (this._state) {
+      case State.NONE: {
+        const progress = this._getProgress(offsetX)
+        const time = this._getTime(progress)
 
-      this._selectedKeyFrame.setTime(time)
-      // TODO super dirty, seriously
-      // might be much better to have a updateKeyFrame(keyFrame: KeyFrame) in the sequence
-      this._activeSequence.addKeyFrame(this._selectedKeyFrame)
-      this._render()
-      return
-    }
+        // select keyFrame
+        if (this._activeSequence) {
+          const keyFrames = this._activeSequence.getKeyFrames()
 
-    if (!this._isMouseDown) {
-      // TODO refactor updateProgress(x: number) to getProgress(): number
-      // TODO refactor updateTime() to getTime(): number
-      const progress = offsetX / this._$canvas.width
-      const time = (progress * (this._boundaries[1] - this._boundaries[0])) + this._boundaries[0]
+          let selectedKeyFrameFound = false
 
-      // select keyFrame
-      if (this._activeSequence) {
-        const keyFrames = this._activeSequence.getKeyFrames()
-
-        let selectedKeyFrameFound = false
-
-        for (let keyFrame of keyFrames) {
-          const delta = Math.abs(time - keyFrame.getTime())
-          
-          if (delta < this._selectionDistance) {
-            selectedKeyFrameFound = true
-            this._selectedKeyFrame = keyFrame
-            break
+          for (let keyFrame of keyFrames) {
+            const delta = Math.abs(time - keyFrame.getTime())
+            
+            if (delta < this._selectionDistance) {
+              selectedKeyFrameFound = true
+              this._selectedKeyFrame = keyFrame
+              break
+            }
           }
+
+          if (!selectedKeyFrameFound) {
+            this._selectedKeyFrame = null
+          }
+
+          this._render()
         }
 
-        if (!selectedKeyFrameFound) {
-          this._selectedKeyFrame = null
-        }
+        break
       }
 
-      this._render()
+      case State.KEYFRAME: {
+        const progress = this._getProgress(offsetX)
+        const time = this._getTime(progress)
 
-      return
+        this._selectedKeyFrame.setTime(time)
+
+        this._activeSequence.updateKeyFrames()
+        this._render()
+
+        break
+      }
+
+      case State.CURSOR: {
+        this._updateProgress(offsetX)
+        this._updateTime(this._progress)
+    
+        this._render()
+        this._updateSequences()
+
+        break
+      }
     }
-    
-    this._updateProgress(offsetX)
-    
-    this._render()
-    this._updateSequences()
+  }
+
+  private _getProgress(x: number) {
+    let progress = x / this._$canvas.width
+
+    if (this._isSnapEnabled) {
+      progress = this._snapProgress(progress)
+    }
+
+    return progress
+  }
+
+  private _snapProgress(progress: number):number {
+    const snapSteps = (this._boundaries[1] - this._boundaries[0]) * this._snapResolution
+
+    return Math.round(progress * snapSteps) / snapSteps
+  }
+
+  private _getTime(progress: number): number {
+    return (progress * (this._boundaries[1] - this._boundaries[0])) + this._boundaries[0]
   }
 
   private _updateProgress(x: number) {
-    this._progress = x / this._$canvas.width
-
-    if (this._isSnapEnabled) {
-      this._snapProgress() 
-    }
-
-    this._updateTime()
+    this._progress = this._getProgress(x)
   }
 
-  private _snapProgress() {
-    const snapSteps = (this._boundaries[1] - this._boundaries[0]) * this._snapResolution
-
-    this._progress = Math.round(this._progress * snapSteps) / snapSteps
-  }
-
-  private _updateTime() {
-    this._time = (this._progress * (this._boundaries[1] - this._boundaries[0])) + this._boundaries[0]
+  private _updateTime(progress: number) {
+    this._time = this._getTime(progress)
 
     this.onTimeChange.dispatch(this._time)
   }
@@ -248,7 +295,7 @@ export default class Timeline {
       this._progress -= this._progress
     }
     
-    this._updateTime()
+    this._updateTime(this._progress)
     this._render()
     this._updateSequences()
   }
@@ -435,7 +482,7 @@ export default class Timeline {
     this._boundaries[1] = to
     
     if (this._isSnapEnabled) {
-      this._snapProgress()
+      this._progress = this._snapProgress(this._progress)
     }
     
     this._render()
@@ -449,7 +496,7 @@ export default class Timeline {
     this._isSnapEnabled = snap
 
     if (this._isSnapEnabled) {
-      this._snapProgress()
+      this._progress = this._snapProgress(this._progress)
       this._render()
     }
   }
@@ -462,7 +509,7 @@ export default class Timeline {
     this._snapResolution = resolution
 
     if (this._isSnapEnabled) {
-      this._snapProgress()
+      this._progress = this._snapProgress(this._progress)
       this._render()
     }
   }

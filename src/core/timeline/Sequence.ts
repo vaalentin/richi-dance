@@ -24,6 +24,45 @@ export default class Sequence {
     this.onUpdate = new Signal()
   }
 
+  public updateKeyFrames() {
+    // sort the keyFrames based on their time (from lower to higher)
+    this._keyFrames.sort((a, b) => a.getTime() - b.getTime())
+
+    // update hasPosition, hasRotation and hasScale for every keyFrames.
+    for (let i = this._keyFrames.length - 2; i >= 0; --i) {
+      const currentKeyFrame = this._keyFrames[i]
+      const nextKeyFrame = this._keyFrames[i + 1]
+
+      // set to true
+      // next iteration might set them to false when looking at the previous key frame
+      currentKeyFrame.hasPosition(true)
+      currentKeyFrame.hasRotation(true)
+      currentKeyFrame.hasScale(true)
+
+      // update the next key frame
+      if (currentKeyFrame.getPosition().equals(nextKeyFrame.getPosition())) {
+        nextKeyFrame.hasPosition(false)
+      }
+
+      if (currentKeyFrame.getRotation().equals(nextKeyFrame.getRotation())) {
+        nextKeyFrame.hasRotation(false)
+      }      
+
+      if (currentKeyFrame.getScale().equals(nextKeyFrame.getScale())) {
+        nextKeyFrame.hasScale(false)
+      }
+    }
+
+    // TODO look for first and last keyFrames, don't update them in the loop
+    this._keyFrames[this._keyFrames.length - 1].hasPosition(true)
+    this._keyFrames[this._keyFrames.length - 1].hasRotation(true)
+    this._keyFrames[this._keyFrames.length - 1].hasScale(true)
+
+    if (this._timeline) {
+      this._timeline.forceRender()
+    }
+  }
+
   public update(time:number) {
     const { _keyFrames: keyFrames } = this
 
@@ -174,51 +213,14 @@ export default class Sequence {
     }
 
     if (i !== -1) {
-      if (this._keyFrames[i] !== keyFrame) {
-        this._keyFrames[i].dispose()
-        this._keyFrames.splice(i, 1)  
-      }
+      this._keyFrames[i].dispose()
+      this._keyFrames.splice(i, 1)
     }
-    
+
     // add the new keyFrame
     this._keyFrames.push(keyFrame)
-
-    // sort the keyFrames based on their time (from lower to higher)
-    this._keyFrames.sort((a, b) => a.getTime() - b.getTime())
-
-    // update hasPosition, hasRotation and hasScale for every keyFrames.
-    for (let i = this._keyFrames.length - 2; i >= 0; --i) {
-      const currentKeyFrame = this._keyFrames[i]
-      const nextKeyFrame = this._keyFrames[i + 1]
-
-      // set to true
-      // next iteration might set them to false when looking at the previous key frame
-      currentKeyFrame.hasPosition(true)
-      currentKeyFrame.hasRotation(true)
-      currentKeyFrame.hasScale(true)
-
-      // update the next key frame
-      if (currentKeyFrame.getPosition().equals(nextKeyFrame.getPosition())) {
-        nextKeyFrame.hasPosition(false)
-      }
-
-      if (currentKeyFrame.getRotation().equals(nextKeyFrame.getRotation())) {
-        nextKeyFrame.hasRotation(false)
-      }      
-
-      if (currentKeyFrame.getScale().equals(nextKeyFrame.getScale())) {
-        nextKeyFrame.hasScale(false)
-      }
-    }
-
-    // TODO look for first and last keyFrames, don't update them in the loop
-    this._keyFrames[this._keyFrames.length - 1].hasPosition(true)
-    this._keyFrames[this._keyFrames.length - 1].hasRotation(true)
-    this._keyFrames[this._keyFrames.length - 1].hasScale(true)
-
-    if (this._timeline) {
-      this._timeline.forceRender()
-    }
+    
+    this.updateKeyFrames()
   }
 
   public removeKeyFrame(keyFrame:KeyFrame) {
@@ -229,6 +231,8 @@ export default class Sequence {
     }
 
     this._keyFrames.splice(i, 1)
+
+    this.updateKeyFrames()
 
     if (this._timeline) {
       this._timeline.forceRender()
@@ -264,6 +268,7 @@ export default class Sequence {
   }
 
   public dispose() {
-
+    this._keyFrames.length = 0
+    this.onUpdate.dispose()
   }
 }
