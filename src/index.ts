@@ -10,7 +10,6 @@ import KeyFrame from './core/timeline/KeyFrame'
 import Sequence from './core/timeline/Sequence'
 import Timeline from './core/timeline/Timeline'
 import TimelineControls from './core/timeline/TimelineControls'
-import TimelineScrubber from './core/timeline/TimelineScrubber'
 
 const $app = document.querySelector('.app') as HTMLElement
 const $viewport = $app.querySelector('.viewport') as HTMLElement
@@ -34,7 +33,6 @@ scene.add(cube)
 const timeline = new Timeline()
 timeline.setBoundaries(0, 10)
 
-const scrubber = new TimelineScrubber(timeline, $timelineScrubber)
 const controls = new TimelineControls(timeline)
 
 const sequence = new Sequence(cube)
