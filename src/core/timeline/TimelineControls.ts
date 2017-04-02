@@ -129,7 +129,6 @@ export default class Controls {
   }
 
   private _handlePlayPause() {
-    alert('here')
     if (this._timeline.isPlaying()) {
       this._timeline.pause()
     }
