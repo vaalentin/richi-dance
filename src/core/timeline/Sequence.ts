@@ -25,41 +25,138 @@ export default class Sequence {
   }
 
   public update(time:number) {
-    for (let i = 0; i < this._keyFrames.length - 1; ++i) {
-      const currentKeyFrame = this._keyFrames[i]
-      const nextKeyFrame = this._keyFrames[i + 1]
+    const { _keyFrames: keyFrames } = this
 
-      if (time >= currentKeyFrame.getTime() && time <= nextKeyFrame.getTime()) {
-        // that's where we're at, in between those 2 keyframes
-        
-        // get progress, value from 0 to 1 between the 2 frames
-        const progress = mapValueToRange(time, currentKeyFrame.getTime(), nextKeyFrame.getTime(), 0, 1)
-        
-        const position = new THREE.Vector3().lerpVectors(
-          currentKeyFrame.getPosition(),
-          nextKeyFrame.getPosition(),
-          progress
-        )
-        
-        this._element.position.copy(position)
-        
-        const quaternion = new THREE.Quaternion().setFromEuler(currentKeyFrame.getRotation())
-          .slerp(new THREE.Quaternion().setFromEuler(nextKeyFrame.getRotation()), progress)
-          .normalize()
+    for (let i = 0; i < keyFrames.length - 1; ++i) {
+      const currentKeyFrame = keyFrames[i]
+      const nextKeyFrame = keyFrames[i + 1]
 
-        const rotation = new THREE.Euler().setFromQuaternion(quaternion)
-        
-        this._element.rotation.copy(rotation)
-        
-        const scale = new THREE.Vector3().lerpVectors(
-          currentKeyFrame.getScale(),
-          nextKeyFrame.getScale(),
-          progress
-        )
-        
-        this._element.scale.copy(scale)
+      if (time >= currentKeyFrame.getTime() && time < nextKeyFrame.getTime()) {
+        let from: KeyFrame = null
+        let to: KeyFrame = null
 
-        this.onUpdate.dispatch({ position, rotation, scale })
+        // position
+        if (currentKeyFrame.hasPosition()) {
+          from = currentKeyFrame
+        }
+        else {
+          for (let j = i - 1; j >= 0; --j) {
+            const keyFrame = keyFrames[j]
+
+            if (keyFrame.hasPosition()) {
+              from = keyFrame
+              break
+            }
+          }
+        }
+
+        if (nextKeyFrame.hasPosition()) {
+          to = nextKeyFrame
+        }
+        else {
+          for (let j = i + 1; j < keyFrames.length; ++j) {
+            const keyFrame = keyFrames[j]
+
+            if (keyFrame.hasPosition()) {
+              to = keyFrame
+              break
+            }
+          }
+        }
+
+        if (from && to) {
+          const progress = mapValueToRange(time, from.getTime(), to.getTime(), 0, 1)
+          
+          const position = new THREE.Vector3().lerpVectors(
+            from.getPosition(),
+            to.getPosition(),
+            progress
+          )
+
+          this._element.position.copy(position)
+        }
+
+        // rotation
+        if (currentKeyFrame.hasRotation()) {
+          from = currentKeyFrame
+        }
+        else {
+          for (let j = i - 1; j >= 0; --j) {
+            const keyFrame = keyFrames[j]
+
+            if (keyFrame.hasRotation()) {
+              from = keyFrame
+              break
+            }
+          }
+        }
+
+        if (nextKeyFrame.hasRotation()) {
+          to = nextKeyFrame
+        }
+        else {
+          for (let j = i + 1; j < keyFrames.length; ++j) {
+            const keyFrame = keyFrames[j]
+
+            if (keyFrame.hasRotation()) {
+              to = keyFrame
+              break
+            }
+          }
+        }
+
+        if (from && to) {
+          const progress = mapValueToRange(time, from.getTime(), to.getTime(), 0, 1)
+
+           const quaternion = new THREE.Quaternion().setFromEuler(from.getRotation())
+            .slerp(new THREE.Quaternion().setFromEuler(to.getRotation()), progress)
+            .normalize()
+
+          this._element.rotation.setFromQuaternion(quaternion)
+        }
+
+        // scale
+        if (currentKeyFrame.hasScale()) {
+          from = currentKeyFrame
+        }
+        else {
+          for (let j = i - 1; j >= 0; --j) {
+            const keyFrame = keyFrames[j]
+
+            if (keyFrame.hasScale()) {
+              from = keyFrame
+              break
+            }
+          }
+        }
+
+        if (nextKeyFrame.hasScale()) {
+          to = nextKeyFrame
+        }
+        else {
+          for (let j = i + 1; j < keyFrames.length; ++j) {
+            const keyFrame = keyFrames[j]
+
+            if (keyFrame.hasScale()) {
+              to = keyFrame
+              break
+            }
+          }
+        }
+
+        if (from && to) {
+          const progress = mapValueToRange(time, from.getTime(), to.getTime(), 0, 1)
+          
+          const scale = new THREE.Vector3().lerpVectors(
+            from.getScale(),
+            to.getScale(),
+            progress
+          )
+
+          this._element.scale.copy(scale)
+        }
+
+        // this.onUpdate.dispatch({ position, rotation, scale })
       }
     }
   }
@@ -88,18 +185,34 @@ export default class Sequence {
     this._keyFrames.sort((a, b) => a.getTime() - b.getTime())
 
     // update hasPosition, hasRotation and hasScale for every keyFrames.
-    for (let i = 0; i < this._keyFrames.length; ++i) {
+    for (let i = this._keyFrames.length - 2; i >= 0; --i) {
       const currentKeyFrame = this._keyFrames[i]
-      const nextKeyFrame = this._keyFrames[(i + 1) % this._keyFrames.length]
+      const nextKeyFrame = this._keyFrames[i + 1]
 
-      const hasPosition = !currentKeyFrame.getPosition().equals(nextKeyFrame.getPosition())
-      const hasRotation = !currentKeyFrame.getRotation().equals(nextKeyFrame.getRotation())
-      const hasScale = !currentKeyFrame.getScale().equals(nextKeyFrame.getScale())
+      // set to true
+      // next iteration might set them to false when looking at the previous key frame
+      currentKeyFrame.hasPosition(true)
+      currentKeyFrame.hasRotation(true)
+      currentKeyFrame.hasScale(true)
 
-      currentKeyFrame.hasPosition(hasPosition)
-      currentKeyFrame.hasRotation(hasRotation)
-      currentKeyFrame.hasScale(hasScale)
+      // update the next key frame
+      if (currentKeyFrame.getPosition().equals(nextKeyFrame.getPosition())) {
+        nextKeyFrame.hasPosition(false)
+      }
+
+      if (currentKeyFrame.getRotation().equals(nextKeyFrame.getRotation())) {
+        nextKeyFrame.hasRotation(false)
+      }      
+
+      if (currentKeyFrame.getScale().equals(nextKeyFrame.getScale())) {
+        nextKeyFrame.hasScale(false)
+      }
     }
+
+    // TODO look for first and last keyFrames, don't update them in the loop
+    this._keyFrames[this._keyFrames.length - 1].hasPosition(true)
+    this._keyFrames[this._keyFrames.length - 1].hasRotation(true)
+    this._keyFrames[this._keyFrames.length - 1].hasScale(true)
 
     if (this._timeline) {
       this._timeline.forceRender()
