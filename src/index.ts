@@ -50,6 +50,10 @@ timeline.onTimeChange.add(time => {
   keyFrame.setTime(time)
 })
 
+timeline.onKeyFrameSelected.add(keyFrame => {
+  console.log(JSON.stringify(keyFrame, null, 2))
+})
+
 scene.onTransformControlsChange.add(({ position, rotation, scale }) => {
   keyFrame.setPosition(position)
   keyFrame.setRotation(rotation)

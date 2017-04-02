@@ -61,6 +61,7 @@ export default class Timeline {
 
   public onTimeChange: Signal<number>
   public onPause: Signal<void>
+  public onKeyFrameSelected: Signal<KeyFrame>
 
   constructor(options: TimelineOptions = new TimelineOptions()) {
     this._$element = document.querySelector('.timeline__viewport') as HTMLElement
@@ -96,6 +97,7 @@ export default class Timeline {
 
     this.onTimeChange = new Signal()
     this.onPause = new Signal<void>()
+    this.onKeyFrameSelected = new Signal()
 
     this._bindMethods()
     this._addListeners()
@@ -182,7 +184,8 @@ export default class Timeline {
       // we have selected a keyframe, we don't wish to move it
       case State.KEYFRAME: {
         this._state = State.KEYFRAME_SELECTED
-        console.log('key frame selected')
+        
+        this.onKeyFrameSelected.dispatch(this._selectedKeyFrame)
 
         break
       }
