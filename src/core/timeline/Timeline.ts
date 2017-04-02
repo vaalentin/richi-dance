@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 
 import Sequence from './Sequence'
+import KeyFrame from './KeyFrame'
 import { mapValueToRange } from '../math'
 import * as Keys from '../Keys'
 import Signal from '../Signal'
@@ -14,9 +15,10 @@ export const Render = {
 export class TimelineOptions {
   public boundaries: [number, number] = [0, 10]
   public speed = 1
-  public snap = true
+  public snap = false
   public snapResolution = 4
   public renderMask = Render.TICKS | Render.CURSOR | Render.KEYFRAMES
+  public keyFrameSelectionDistance = 0.05
 }
 
 export default class Timeline {
@@ -40,6 +42,10 @@ export default class Timeline {
 
   private _sequences: Sequence[]
   private _activeSequence: Sequence
+
+  private _isMovingSelectedKeyFrame: boolean
+  private _selectedKeyFrame: KeyFrame
+  private _selectionDistance: number
 
   private _clock: THREE.Clock
   private _requestAnimationFrameId: number
@@ -71,6 +77,10 @@ export default class Timeline {
 
     this._sequences = []
     this._activeSequence = null
+
+    this._isMovingSelectedKeyFrame = false
+    this._selectedKeyFrame = null
+    this._selectionDistance = options.keyFrameSelectionDistance
 
     this._clock = new THREE.Clock()
     this._requestAnimationFrameId = null
@@ -121,6 +131,11 @@ export default class Timeline {
       this.onPause.dispatch()
       this.pause()
     }
+
+    if (this._selectedKeyFrame) {
+      this._isMovingSelectedKeyFrame = true
+      return
+    }
     
     this._updateProgress(offsetX)
     
@@ -129,20 +144,68 @@ export default class Timeline {
   }
   
   private _handleMouseUp() {
+    if (this._isMovingSelectedKeyFrame) {
+      this._isMovingSelectedKeyFrame = false
+    }
+
     this._isMouseDown = false
   }
 
   private _handleMouseLeave() {
+    if (this._isMovingSelectedKeyFrame) {
+      this._isMovingSelectedKeyFrame = false
+    }
+
     this._isMouseDown = false
   }
 
   private _handleMouseMove({ offsetX }: MouseEvent) {
+    if (this._isMovingSelectedKeyFrame) {
+      const progress = offsetX / this._$canvas.width
+      const time = (progress * (this._boundaries[1] - this._boundaries[0])) + this._boundaries[0]
+
+      this._selectedKeyFrame.setTime(time)
+      // TODO super dirty, seriously
+      // might be much better to have a updateKeyFrame(keyFrame: KeyFrame) in the sequence
+      this._activeSequence.addKeyFrame(this._selectedKeyFrame)
+      this._render()
+      return
+    }
+
     if (!this._isMouseDown) {
+      // TODO refactor updateProgress(x: number) to getProgress(): number
+      // TODO refactor updateTime() to getTime(): number
+      const progress = offsetX / this._$canvas.width
+      const time = (progress * (this._boundaries[1] - this._boundaries[0])) + this._boundaries[0]
+
+      // select keyFrame
+      if (this._activeSequence) {
+        const keyFrames = this._activeSequence.getKeyFrames()
+
+        let selectedKeyFrameFound = false
+
+        for (let keyFrame of keyFrames) {
+          const delta = Math.abs(time - keyFrame.getTime())
+          
+          if (delta < this._selectionDistance) {
+            selectedKeyFrameFound = true
+            this._selectedKeyFrame = keyFrame
+            break
+          }
+        }
+
+        if (!selectedKeyFrameFound) {
+          this._selectedKeyFrame = null
+        }
+      }
+
+      this._render()
+
       return
     }
     
     this._updateProgress(offsetX)
-
+    
     this._render()
     this._updateSequences()
   }
@@ -223,13 +286,19 @@ export default class Timeline {
     }
 
     if (this._renderMask & Render.KEYFRAMES && this._activeSequence) {
-      this._context.strokeStyle = 'green'
-      this._context.lineWidth = 2
-      
       const keyFrames = this._activeSequence.getKeyFrames()
       
       for (let i = 0; i < keyFrames.length; ++i) {
         const keyFrame = keyFrames[i]
+
+        if (keyFrame === this._selectedKeyFrame) {
+          this._context.strokeStyle = 'blue'
+          this._context.lineWidth = 4
+        }
+        else {
+          this._context.strokeStyle = 'green'
+          this._context.lineWidth = 2
+        }
         
         const time = keyFrame.getTime()
         

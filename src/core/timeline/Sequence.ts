@@ -174,8 +174,10 @@ export default class Sequence {
     }
 
     if (i !== -1) {
-      this._keyFrames[i].dispose()
-      this._keyFrames.splice(i, 1)
+      if (this._keyFrames[i] !== keyFrame) {
+        this._keyFrames[i].dispose()
+        this._keyFrames.splice(i, 1)  
+      }
     }
     
     // add the new keyFrame
