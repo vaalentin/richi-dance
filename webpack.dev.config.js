@@ -18,7 +18,8 @@ module.exports = {
           { loader: 'style-loader' },
           { loader: 'css-loader' }
         ]
-      }
+      },
+      { test: /\.json$/, use: 'file-loader' }
     ]
   },
   plugins: [

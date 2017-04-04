@@ -22,7 +22,8 @@ module.exports = {
             { loader: 'css-loader' }
           ]
         })
-      }
+      },
+      { test: /\.json$/, use: 'file-loader' }
     ]
   },
   plugins: [

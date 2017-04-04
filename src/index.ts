@@ -1,3 +1,5 @@
+/// <reference path="./core/definitions.d.ts" />
+
 import * as THREE from 'three'
 
 import 'normalize.css'
