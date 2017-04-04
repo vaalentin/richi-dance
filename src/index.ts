@@ -78,3 +78,22 @@ window.addEventListener('keydown', ({ keyCode }: KeyboardEvent) => {
       break
   }
 })
+
+const loader = new THREE.JSONLoader()
+
+const material = new THREE.MeshLambertMaterial({
+  vertexColors: THREE.VertexColors
+})
+
+loader.load(require<string>('./models/dummy-floor.json'), geometry => {
+  floor = new THREE.Mesh(geometry, material)
+  scene.add(floor)
+})
+
+loader.load(require<string>('./models/dummy-character.json'), geometry => {
+  character = new THREE.Mesh(geometry, material)
+  scene.add(character)
+})
+
+scene.onUpdate.add(() => {
+})

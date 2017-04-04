@@ -28,6 +28,7 @@ export default class Scene {
 
   private _requestAnimationFrameId: number;
 
+  public onUpdate: Signal<void>
   public onRaycast: Signal<THREE.Intersection>
   public onTransformControlsChange: Signal<{ position: THREE.Vector3, rotation: THREE.Euler, scale: THREE.Vector3}>
 
@@ -54,6 +55,7 @@ export default class Scene {
     this._raycaster = new THREE.Raycaster()
     this._mouse = new THREE.Vector2(-1, -1)
 
+    this.onUpdate = new Signal<void>()
     this.onRaycast = new Signal()
     this.onTransformControlsChange = new Signal()
 
@@ -183,6 +185,8 @@ export default class Scene {
     this._requestAnimationFrameId = window.requestAnimationFrame(this._update)
 
     this._transformControls.update()
+
+    this.onUpdate.dispatch()
 
     this._render()
   }
