@@ -1,6 +1,7 @@
 /// <reference path="./core/definitions.d.ts" />
 
 import * as THREE from 'three'
+import ShadowMesh from './core/webgl/ShadowMesh'
 
 import 'normalize.css'
 import './index.css'
@@ -85,15 +86,35 @@ const material = new THREE.MeshLambertMaterial({
   vertexColors: THREE.VertexColors
 })
 
+let character: THREE.Mesh
+let floor: THREE.Mesh
+
+let lightPosition = new THREE.Vector4(5, 7, - 1, 0.01)
+let floorPlane: THREE.Plane
+let characterShadow
+
+var sunLight = new THREE.DirectionalLight( 'rgb(255,255,255)', 1 );
+sunLight.position.set( 5, 7, - 1 );
+sunLight.lookAt( new THREE.Vector3(0, 0, 0));
+scene.add( sunLight );
+
 loader.load(require<string>('./models/dummy-floor.json'), geometry => {
   floor = new THREE.Mesh(geometry, material)
   scene.add(floor)
+
+  floorPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0.01)
 })
 
 loader.load(require<string>('./models/dummy-character.json'), geometry => {
   character = new THREE.Mesh(geometry, material)
   scene.add(character)
+
+  characterShadow = new ShadowMesh(character)
+  scene.add(characterShadow)
 })
 
 scene.onUpdate.add(() => {
+  if (characterShadow) {
+    characterShadow.update(floorPlane, lightPosition)
+  }
 })
