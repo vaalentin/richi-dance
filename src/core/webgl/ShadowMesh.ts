@@ -1,11 +1,11 @@
 import * as THREE from 'three'
 
 // from https://raw.githubusercontent.com/mrdoob/three.js/master/examples/js/objects/ShadowMesh.js
-export default function ShadowMesh(mesh: THREE.Mesh) {
+export default function ShadowMesh(mesh: THREE.Mesh, opacity: number = 0.6, color: number|string = 0x000000) {
   var shadowMaterial = new THREE.MeshBasicMaterial( {
-		color: 0x000000,
+		color,
 		transparent: true,
-		opacity: 0.6,
+		opacity,
 		depthWrite: false
 	});
 
