@@ -5,17 +5,27 @@ import KeyFrame from './KeyFrame'
 import Signal from '../Signal'
 import { mapValueToRange } from '../math'
 
+export const Features = {
+  POSITION: 1 << 0,
+  ROTATION: 1 << 1,
+  SCALE: 1 << 2
+}
+
 export default class Sequence {
   private _element: THREE.Object3D
+
+  private _features: number
 
   private _keyFrames: KeyFrame[]
 
   private _timeline: Timeline
 
-  public onUpdate: Signal<{ position: THREE.Vector3, rotation: THREE.Euler, scale: THREE.Vector3 }>
+  public onUpdate: Signal<{ position: THREE.Vector3|null, rotation: THREE.Euler|null, scale: THREE.Vector3|null }>
 
-  constructor(object: THREE.Object3D) {
+  constructor(object: THREE.Object3D, features: number = Features.POSITION | Features.ROTATION | Features.SCALE) {
     this._element = object
+
+    this._features = features
 
     this._keyFrames = []
 
@@ -33,30 +43,46 @@ export default class Sequence {
       const currentKeyFrame = this._keyFrames[i]
       const nextKeyFrame = this._keyFrames[i + 1]
 
-      // set to true
       // next iteration might set them to false when looking at the previous key frame
-      currentKeyFrame.hasPosition(true)
-      currentKeyFrame.hasRotation(true)
-      currentKeyFrame.hasScale(true)
 
-      // update the next key frame
-      if (currentKeyFrame.getPosition().equals(nextKeyFrame.getPosition())) {
-        nextKeyFrame.hasPosition(false)
+      if (this._features & Features.POSITION) {
+        currentKeyFrame.hasPosition(true)
+
+        if (currentKeyFrame.getPosition().equals(nextKeyFrame.getPosition())) {
+          nextKeyFrame.hasPosition(false)
+        }
       }
 
-      if (currentKeyFrame.getRotation().equals(nextKeyFrame.getRotation())) {
-        nextKeyFrame.hasRotation(false)
-      }      
+      if (this._features & Features.ROTATION) {
+        currentKeyFrame.hasRotation(true)
 
-      if (currentKeyFrame.getScale().equals(nextKeyFrame.getScale())) {
-        nextKeyFrame.hasScale(false)
+        if (currentKeyFrame.getRotation().equals(nextKeyFrame.getRotation())) {
+          nextKeyFrame.hasRotation(false)
+        }      
+      }
+
+      if (this._features & Features.SCALE) {
+        currentKeyFrame.hasScale(true)
+
+        if (currentKeyFrame.getScale().equals(nextKeyFrame.getScale())) {
+          nextKeyFrame.hasScale(false)
+        }
       }
     }
 
     // TODO look for first and last keyFrames, don't update them in the loop
-    this._keyFrames[this._keyFrames.length - 1].hasPosition(true)
-    this._keyFrames[this._keyFrames.length - 1].hasRotation(true)
-    this._keyFrames[this._keyFrames.length - 1].hasScale(true)
+
+    if (this._features & Features.POSITION) {
+      this._keyFrames[this._keyFrames.length - 1].hasPosition(true)
+    }
+
+    if (this._features & Features.ROTATION) {
+      this._keyFrames[this._keyFrames.length - 1].hasRotation(true)
+    }
+
+    if (this._features & Features.SCALE) {
+      this._keyFrames[this._keyFrames.length - 1].hasScale(true)
+    }
 
     if (this._timeline) {
       this._timeline.forceRender()
@@ -74,128 +100,137 @@ export default class Sequence {
         let from: KeyFrame = null
         let to: KeyFrame = null
 
-        // position
-        if (currentKeyFrame.hasPosition()) {
-          from = currentKeyFrame
-        }
-        else {
-          for (let j = i - 1; j >= 0; --j) {
-            const keyFrame = keyFrames[j]
+        let position: THREE.Vector3 = null
+        let rotation: THREE.Euler = null
+        let scale: THREE.Vector3 = null
 
-            if (keyFrame.hasPosition()) {
-              from = keyFrame
-              break
+        if (this._features & Features.POSITION) {
+          if (currentKeyFrame.hasPosition()) {
+            from = currentKeyFrame
+          }
+          else {
+            for (let j = i - 1; j >= 0; --j) {
+              const keyFrame = keyFrames[j]
+
+              if (keyFrame.hasPosition()) {
+                from = keyFrame
+                break
+              }
             }
+          }
+
+          if (nextKeyFrame.hasPosition()) {
+            to = nextKeyFrame
+          }
+          else {
+            for (let j = i + 1; j < keyFrames.length; ++j) {
+              const keyFrame = keyFrames[j]
+
+              if (keyFrame.hasPosition()) {
+                to = keyFrame
+                break
+              }
+            }
+          }
+
+          if (from && to) {
+            const progress = mapValueToRange(time, from.getTime(), to.getTime(), 0, 1)
+            
+            position = new THREE.Vector3().lerpVectors(
+              from.getPosition(),
+              to.getPosition(),
+              progress
+            )
+
+            this._element.position.copy(position)
           }
         }
 
-        if (nextKeyFrame.hasPosition()) {
-          to = nextKeyFrame
-        }
-        else {
-          for (let j = i + 1; j < keyFrames.length; ++j) {
-            const keyFrame = keyFrames[j]
+        if (this._features & Features.ROTATION) {
+          if (currentKeyFrame.hasRotation()) {
+            from = currentKeyFrame
+          }
+          else {
+            for (let j = i - 1; j >= 0; --j) {
+              const keyFrame = keyFrames[j]
 
-            if (keyFrame.hasPosition()) {
-              to = keyFrame
-              break
+              if (keyFrame.hasRotation()) {
+                from = keyFrame
+                break
+              }
             }
+          }
+
+          if (nextKeyFrame.hasRotation()) {
+            to = nextKeyFrame
+          }
+          else {
+            for (let j = i + 1; j < keyFrames.length; ++j) {
+              const keyFrame = keyFrames[j]
+
+              if (keyFrame.hasRotation()) {
+                to = keyFrame
+                break
+              }
+            }
+          }
+
+          if (from && to) {
+            const progress = mapValueToRange(time, from.getTime(), to.getTime(), 0, 1)
+
+            const quaternion = new THREE.Quaternion().setFromEuler(from.getRotation())
+              .slerp(new THREE.Quaternion().setFromEuler(to.getRotation()), progress)
+              .normalize()
+
+            rotation = new THREE.Euler().setFromQuaternion(quaternion)
+
+            this._element.rotation.copy(rotation)
           }
         }
 
-        if (from && to) {
-          const progress = mapValueToRange(time, from.getTime(), to.getTime(), 0, 1)
-          
-          const position = new THREE.Vector3().lerpVectors(
-            from.getPosition(),
-            to.getPosition(),
-            progress
-          )
+        if (this._features & Features.SCALE) {
+          if (currentKeyFrame.hasScale()) {
+            from = currentKeyFrame
+          }
+          else {
+            for (let j = i - 1; j >= 0; --j) {
+              const keyFrame = keyFrames[j]
 
-          this._element.position.copy(position)
-        }
-
-        // rotation
-        if (currentKeyFrame.hasRotation()) {
-          from = currentKeyFrame
-        }
-        else {
-          for (let j = i - 1; j >= 0; --j) {
-            const keyFrame = keyFrames[j]
-
-            if (keyFrame.hasRotation()) {
-              from = keyFrame
-              break
+              if (keyFrame.hasScale()) {
+                from = keyFrame
+                break
+              }
             }
+          }
+
+          if (nextKeyFrame.hasScale()) {
+            to = nextKeyFrame
+          }
+          else {
+            for (let j = i + 1; j < keyFrames.length; ++j) {
+              const keyFrame = keyFrames[j]
+
+              if (keyFrame.hasScale()) {
+                to = keyFrame
+                break
+              }
+            }
+          }
+
+          if (from && to) {
+            const progress = mapValueToRange(time, from.getTime(), to.getTime(), 0, 1)
+            
+            scale = new THREE.Vector3().lerpVectors(
+              from.getScale(),
+              to.getScale(),
+              progress
+            )
+
+            this._element.scale.copy(scale)
           }
         }
 
-        if (nextKeyFrame.hasRotation()) {
-          to = nextKeyFrame
-        }
-        else {
-          for (let j = i + 1; j < keyFrames.length; ++j) {
-            const keyFrame = keyFrames[j]
-
-            if (keyFrame.hasRotation()) {
-              to = keyFrame
-              break
-            }
-          }
-        }
-
-        if (from && to) {
-          const progress = mapValueToRange(time, from.getTime(), to.getTime(), 0, 1)
-
-           const quaternion = new THREE.Quaternion().setFromEuler(from.getRotation())
-            .slerp(new THREE.Quaternion().setFromEuler(to.getRotation()), progress)
-            .normalize()
-
-          this._element.rotation.setFromQuaternion(quaternion)
-        }
-
-        // scale
-        if (currentKeyFrame.hasScale()) {
-          from = currentKeyFrame
-        }
-        else {
-          for (let j = i - 1; j >= 0; --j) {
-            const keyFrame = keyFrames[j]
-
-            if (keyFrame.hasScale()) {
-              from = keyFrame
-              break
-            }
-          }
-        }
-
-        if (nextKeyFrame.hasScale()) {
-          to = nextKeyFrame
-        }
-        else {
-          for (let j = i + 1; j < keyFrames.length; ++j) {
-            const keyFrame = keyFrames[j]
-
-            if (keyFrame.hasScale()) {
-              to = keyFrame
-              break
-            }
-          }
-        }
-
-        if (from && to) {
-          const progress = mapValueToRange(time, from.getTime(), to.getTime(), 0, 1)
-          
-          const scale = new THREE.Vector3().lerpVectors(
-            from.getScale(),
-            to.getScale(),
-            progress
-          )
-
-          this._element.scale.copy(scale)
-        }
-
-        // this.onUpdate.dispatch({ position, rotation, scale })
+        this.onUpdate.dispatch({ position, rotation, scale })
       }
     }
   }
