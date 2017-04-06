@@ -20,7 +20,6 @@ const $timelineScrubber = $app.querySelector('.timeline__scrubber') as HTMLEleme
 
 const scene = new Scene($viewport)
 scene.start()
-scene.getCamera().position.z = 5
 
 
 const cube = new THREE.Mesh(
@@ -32,6 +31,10 @@ const cube = new THREE.Mesh(
 
 scene.addToRaycast(cube)
 scene.add(cube)
+const camera = scene.getCamera()
+camera.position.z = 20
+camera.position.y = 5
+camera.lookAt(new THREE.Vector3(0, 0, 0))
 
 const timeline = new Timeline()
 timeline.setBoundaries(0, 10)
