@@ -49,6 +49,11 @@ export default class Scene {
     this._scene.add(this._transformControls)
     this._orbitControls = new OrbitControls(this._camera, this._$element)
 
+    this._orbitControls.enablePan = false
+    this._orbitControls.minDistance = 10
+    this._orbitControls.maxDistance = 40
+    this._orbitControls.maxZoom = 1
+
     this._requestAnimationFrameId = null
 
     this._objectsToRaycast = []
