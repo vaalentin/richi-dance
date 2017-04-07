@@ -1,6 +1,7 @@
 import Timeline from './Timeline'
 import Sequence from './Sequence'
 import * as Keys from '../Keys'
+import Signal from '../Signal'
 
 export default class Controls {
   private _timeline: Timeline
@@ -13,10 +14,19 @@ export default class Controls {
   private _$boundariesToInput: HTMLInputElement
   private _$snapButton: HTMLInputElement
   private _$snapResolutionInput: HTMLInputElement
+  private _$saveAnimationButton: HTMLInputElement
+  private _$getAnimationButton: HTMLInputElement
+  private _$setAnimationButton: HTMLInputElement
+  private _$clearAnimationButton: HTMLInputElement
 
   private _$help: HTMLElement
 
   private _isHelpOpen: boolean
+
+  public onSaveAnimation: Signal<void>
+  public onGetAnimation: Signal<void>
+  public onSetAnimation: Signal<{[name: string]: any}>
+  public onClearAnimation: Signal<void>
 
   constructor(timeline: Timeline) {
     this._timeline = timeline
@@ -31,10 +41,19 @@ export default class Controls {
     this._$boundariesToInput = $controls.querySelector('.controls__boundaries-to') as HTMLInputElement
     this._$snapButton = $controls.querySelector('.controls__snap') as HTMLInputElement
     this._$snapResolutionInput = $controls.querySelector('.controls__snap-resolution') as HTMLInputElement
+    this._$saveAnimationButton = $controls.querySelector('.controls__save-animation') as HTMLInputElement
+    this._$getAnimationButton = $controls.querySelector('.controls__get-animation') as HTMLInputElement
+    this._$setAnimationButton = $controls.querySelector('.controls__set-animation') as HTMLInputElement
+    this._$clearAnimationButton = $controls.querySelector('.controls__clear-animation') as HTMLInputElement
 
     this._$help = document.querySelector('.help') as HTMLElement
 
     this._isHelpOpen = false
+
+    this.onSaveAnimation = new Signal<void>()
+    this.onGetAnimation = new Signal<void>()
+    this.onSetAnimation = new Signal()
+    this.onClearAnimation = new Signal<void>()
 
     this._setInitialState()
     this._bindMethods()
@@ -65,6 +84,10 @@ export default class Controls {
     this._handleBoundaries = this._handleBoundaries.bind(this)
     this._handleSnap = this._handleSnap.bind(this)
     this._handleSnapResolution = this._handleSnapResolution.bind(this)
+    this._handleSaveAnimation = this._handleSaveAnimation.bind(this)
+    this._handleGetAnimation = this._handleGetAnimation.bind(this)
+    this._handleSetAnimation = this._handleSetAnimation.bind(this)
+    this._handleClearAnimation = this._handleClearAnimation.bind(this)
 
     this._updatePlayPause = this._updatePlayPause.bind(this)
 
@@ -80,6 +103,10 @@ export default class Controls {
     this._$boundariesToInput.addEventListener('input', this._handleBoundaries)
     this._$snapButton.addEventListener('click', this._handleSnap)
     this._$snapResolutionInput.addEventListener('input', this._handleSnapResolution)
+    this._$saveAnimationButton.addEventListener('click', this._handleSaveAnimation)
+    this._$getAnimationButton.addEventListener('click', this._handleGetAnimation)
+    this._$setAnimationButton.addEventListener('click', this._handleSetAnimation)
+    this._$clearAnimationButton.addEventListener('click', this._handleClearAnimation)
 
     this._timeline.onPause.add(this._updatePlayPause)
 
@@ -95,6 +122,10 @@ export default class Controls {
     this._$boundariesToInput.removeEventListener('input', this._handleBoundaries)
     this._$snapButton.removeEventListener('click', this._handleSnap)
     this._$snapResolutionInput.removeEventListener('input', this._handleSnapResolution)
+    this._$saveAnimationButton.removeEventListener('click', this._handleSaveAnimation)
+    this._$getAnimationButton.removeEventListener('click', this._handleGetAnimation)
+    this._$setAnimationButton.removeEventListener('click', this._handleSetAnimation)
+    this._$clearAnimationButton.removeEventListener('click', this._handleClearAnimation)
 
     this._timeline.onPause.remove(this._updatePlayPause)
 
@@ -200,6 +231,35 @@ export default class Controls {
         
         break
     }
+  }
+
+  private _handleSaveAnimation() {
+    this.onSaveAnimation.dispatch()
+  }
+
+  private _handleGetAnimation() {
+    this.onGetAnimation.dispatch()
+  }
+
+  private _handleSetAnimation() {
+    const animationString = window.prompt()
+    
+    let animation: {[name: string]: any}
+
+    try {
+      animation = JSON.parse(animationString)
+    }
+    catch (e) {}
+
+    if (!animation) {
+      animation = {}
+    }
+
+    this.onSetAnimation.dispatch(animation)
+  }
+
+  private _handleClearAnimation() {
+    this.onClearAnimation.dispatch()
   }
 
   private _openHelp() {
