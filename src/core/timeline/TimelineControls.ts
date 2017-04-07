@@ -18,6 +18,7 @@ export default class Controls {
   private _$getAnimationButton: HTMLInputElement
   private _$setAnimationButton: HTMLInputElement
   private _$clearAnimationButton: HTMLInputElement
+  private _$toggleHelpersButton: HTMLInputElement
 
   private _$help: HTMLElement
 
@@ -27,6 +28,7 @@ export default class Controls {
   public onGetAnimation: Signal<void>
   public onSetAnimation: Signal<{[name: string]: any}>
   public onClearAnimation: Signal<void>
+  public onToggleHelpers: Signal<void>
 
   constructor(timeline: Timeline) {
     this._timeline = timeline
@@ -45,6 +47,7 @@ export default class Controls {
     this._$getAnimationButton = $controls.querySelector('.controls__get-animation') as HTMLInputElement
     this._$setAnimationButton = $controls.querySelector('.controls__set-animation') as HTMLInputElement
     this._$clearAnimationButton = $controls.querySelector('.controls__clear-animation') as HTMLInputElement
+    this._$toggleHelpersButton = $controls.querySelector('.controls__toggle-helpers') as HTMLInputElement
 
     this._$help = document.querySelector('.help') as HTMLElement
 
@@ -54,6 +57,7 @@ export default class Controls {
     this.onGetAnimation = new Signal<void>()
     this.onSetAnimation = new Signal()
     this.onClearAnimation = new Signal<void>()
+    this.onToggleHelpers = new Signal<void>()
 
     this._setInitialState()
     this._bindMethods()
@@ -88,6 +92,7 @@ export default class Controls {
     this._handleGetAnimation = this._handleGetAnimation.bind(this)
     this._handleSetAnimation = this._handleSetAnimation.bind(this)
     this._handleClearAnimation = this._handleClearAnimation.bind(this)
+    this._handleToggleHelpers = this._handleToggleHelpers.bind(this)
 
     this._updatePlayPause = this._updatePlayPause.bind(this)
 
@@ -107,6 +112,7 @@ export default class Controls {
     this._$getAnimationButton.addEventListener('click', this._handleGetAnimation)
     this._$setAnimationButton.addEventListener('click', this._handleSetAnimation)
     this._$clearAnimationButton.addEventListener('click', this._handleClearAnimation)
+    this._$toggleHelpersButton.addEventListener('click', this._handleToggleHelpers)
 
     this._timeline.onPause.add(this._updatePlayPause)
 
@@ -126,6 +132,7 @@ export default class Controls {
     this._$getAnimationButton.removeEventListener('click', this._handleGetAnimation)
     this._$setAnimationButton.removeEventListener('click', this._handleSetAnimation)
     this._$clearAnimationButton.removeEventListener('click', this._handleClearAnimation)
+    this._$toggleHelpersButton.removeEventListener('click', this._handleToggleHelpers)
 
     this._timeline.onPause.remove(this._updatePlayPause)
 
@@ -260,6 +267,10 @@ export default class Controls {
 
   private _handleClearAnimation() {
     this.onClearAnimation.dispatch()
+  }
+
+  private _handleToggleHelpers() {
+    this.onToggleHelpers.dispatch()
   }
 
   private _openHelp() {

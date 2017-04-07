@@ -165,6 +165,23 @@ controls.onClearAnimation.add(() => {
   hydrate(defaultAnimation)
 })
 
+let helpersVisible = true
+
+controls.onToggleHelpers.add(() => {
+  for (let bone of controllableBones) {
+    const helper = bone.getObject()
+
+    if (helpersVisible) {
+      scene.remove(helper)
+    }
+    else {
+      scene.add(helper)
+    }
+  }
+
+  helpersVisible = !helpersVisible
+})
+
 window.addEventListener('keydown', ({ keyCode }: KeyboardEvent) => {
   switch (keyCode) {
     case Keys.A:
