@@ -6,10 +6,12 @@ export default function ShadowMesh(mesh: THREE.Mesh, opacity: number = 0.6, colo
 		color,
 		transparent: true,
 		opacity,
-		depthWrite: false
+		depthWrite: false,
+		skinning: true,
+		side: THREE.DoubleSide
 	});
 
-	THREE.Mesh.call(this, mesh.geometry, shadowMaterial);
+	THREE.SkinnedMesh.call(this, mesh.geometry, shadowMaterial, false);
 
 	this.meshMatrix = mesh.matrixWorld;
 
@@ -17,7 +19,7 @@ export default function ShadowMesh(mesh: THREE.Mesh, opacity: number = 0.6, colo
 	this.matrixAutoUpdate = false;
 }
 
-ShadowMesh.prototype = Object.create(THREE.Mesh.prototype);
+ShadowMesh.prototype = Object.create(THREE.SkinnedMesh.prototype);
 ShadowMesh.prototype.constructor = ShadowMesh;
 
 ShadowMesh.prototype.update = function () {

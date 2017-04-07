@@ -333,6 +333,14 @@ export default class Sequence {
     }
   }
 
+  public getFeatures(): number {
+    return this._features
+  }
+
+  public setFeatures(features: number) {
+    this._features = features
+  }
+
   public dispose() {
     this._keyFrames.length = 0
     this.onUpdate.dispose()

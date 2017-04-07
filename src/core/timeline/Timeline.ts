@@ -174,6 +174,8 @@ export default class Timeline {
         break
       }
     }
+
+    this._updateTime(this._progress)
   }
   
   private _handleMouseUp() {
@@ -541,6 +543,10 @@ export default class Timeline {
     this._renderMask = mask
 
     this._render()
+  }
+
+  public getTime(): number {
+    return this._time
   }
 
   public dispose() {
