@@ -39,7 +39,12 @@ export default class Scene {
 
     this._scene = new THREE.Scene()
 
-    this._renderer = new THREE.WebGLRenderer()
+    this._renderer = new THREE.WebGLRenderer({
+      antialias: true
+    })
+
+    this._renderer.setClearColor(0xa19fa5, 1)
+    
     this._renderer.setSize(width, height)
     this._$element.appendChild(this._renderer.domElement)
 
