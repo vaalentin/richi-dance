@@ -5,6 +5,12 @@ import * as OrbitControls from 'three-orbitcontrols'
 import Signal from '../Signal'
 import * as Keys from '../Keys'
 
+export enum ControlsMode {
+  POSITION,
+  ROTATION,
+  SCALE
+}
+
 type TransformControls = {
   target: { object: THREE.Mesh }
   type: string
@@ -252,6 +258,22 @@ export default class Scene {
     }
     
     this._transformControls.attach(object)
+  }
+
+  public setControlMode(mode: ControlsMode) {
+    switch (mode) {
+      case ControlsMode.POSITION:
+        this._transformControls.setMode('translate')
+        break
+
+      case ControlsMode.ROTATION:
+        this._transformControls.setMode('rotate')
+        break
+
+      case ControlsMode.SCALE:
+        this._transformControls.setMode('scale')
+        break
+    }
   }
 
   public dispose() {
