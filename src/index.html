@@ -66,19 +66,27 @@
     <div class="viewport"></div>
     <div class="timeline">
       <div class="timeline__controls">
-        <input type="button" class="controls__toggle" value="Hide"/>
-        <input type="button" class="controls__clear" value="Clear"/>
-        <input type="button" class="controls__play-pause" value="Play"/>
-        <input type="number" class="controls__speed" value="1" min="-10" max="10"/>
-        <input type="number" class="controls__boundaries-from" value="0" min="0" max="100"/>
-        <input type="number" class="controls__boundaries-to" value="10" min="0" max="100"/>
-        <input type="button" class="controls__snap" value="Enable Snap"/>
-        <input type="number" class="controls__snap-resolution" value="1" min="1" max="10"/>
-        <input type="button" class="controls__save-animation" value="Save"/>
-        <input type="button" class="controls__get-animation" value="Get animation"/>
-        <input type="button" class="controls__set-animation" value="Set animation"/>
-        <input type="button" class="controls__clear-animation" value="Clear animation"/>
-        <input type="button" class="controls__toggle-helpers" value="Toggle helpers"/>
+        <div class="controls__section">
+          <label>Speed</label>
+          <input type="number" class="controls__speed" value="1" min="-10" max="10"/>
+          <label>Time from</label>
+          <input type="number" class="controls__boundaries-from" value="0" min="0" max="100"/>
+          <label>Time to</label>
+          <input type="number" class="controls__boundaries-to" value="10" min="0" max="100"/>
+          <label>Snap resolution</label>
+          <input type="number" class="controls__snap-resolution" value="1" min="1" max="10"/>
+        </div>
+        <div class="controls__section">
+          <input type="button" class="controls__toggle" value="Hide"/>
+          <input type="button" class="controls__clear" value="Clear"/>
+          <input type="button" class="controls__play-pause" value="Play"/>
+          <input type="button" class="controls__snap" value="Enable Snap"/>
+          <input type="button" class="controls__save-animation" value="Save"/>
+          <input type="button" class="controls__get-animation" value="Get animation"/>
+          <input type="button" class="controls__set-animation" value="Set animation"/>
+          <input type="button" class="controls__clear-animation" value="Clear animation"/>
+          <input type="button" class="controls__toggle-helpers" value="Toggle helpers"/>
+        </div>
       </div>
       <div class="timeline__viewport"></div>
     </div>

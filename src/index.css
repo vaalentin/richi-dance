@@ -1,3 +1,29 @@
+* {
+  color: #455566;
+}
+
+input[type=button] {
+  background: none;
+  border: none;
+  color: #455566;
+  cursor: pointer;
+}
+
+input[type=button]:hover {
+  color: #48719a;
+}
+
+input[type=number] {
+  color: #455566;
+  border: none;
+  margin-left: 0.5rem;
+  margin-right: 1rem;
+}
+
+label {
+  padding-left: 0.3rem;
+}
+
 .intro {
   position: absolute;
   top: 0;
@@ -33,6 +59,10 @@
 
 .timeline__controls {
   
+}
+
+.controls__section {
+  padding: 0.5rem;
 }
 
 .timeline__viewport {
