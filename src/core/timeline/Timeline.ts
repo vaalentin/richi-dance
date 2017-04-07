@@ -328,10 +328,11 @@ export default class Timeline {
   }
 
   private _render() {
-    this._context.clearRect(0, 0, this._$canvas.width, this._$canvas.height)
+    this._context.fillStyle = '#8e8d92'
+    this._context.fillRect(0, 0, this._$canvas.width, this._$canvas.height)
   
     if (this._renderMask & Render.TICKS) {
-      this._context.strokeStyle = 'grey'
+      this._context.strokeStyle = '#a19fa5'
 
       const steps = (this._boundaries[1] - this._boundaries[0]) * this._snapResolution
       
@@ -360,11 +361,11 @@ export default class Timeline {
         const keyFrame = keyFrames[i]
 
         if (keyFrame === this._selectedKeyFrame) {
-          this._context.strokeStyle = 'blue'
+          this._context.strokeStyle = '#9a487f'
           this._context.lineWidth = 4
         }
         else {
-          this._context.strokeStyle = 'green'
+          this._context.strokeStyle = '#48719a'
           this._context.lineWidth = 2
         }
         
@@ -384,7 +385,7 @@ export default class Timeline {
     }
 
     if (this._renderMask & Render.CURSOR) {
-      this._context.strokeStyle = 'red'
+      this._context.strokeStyle = '#ff6e00'
       this._context.lineWidth = 2
       
       const x = this._progress * this._$canvas.width
