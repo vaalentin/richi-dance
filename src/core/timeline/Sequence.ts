@@ -302,6 +302,37 @@ export default class Sequence {
     this._element = element
   }
 
+  public serialize(): {[key:string]: any} {
+    return {
+      features: this._features,
+      keyFrames: this._keyFrames.map(keyFrame => {
+        const time = keyFrame.getTime()
+        const position = keyFrame.getPosition()
+        const rotation = keyFrame.getRotation()
+        const scale = keyFrame.getScale()
+
+        return {
+          time,
+          position: {
+            x: position.x,
+            y: position.y,
+            z: position.z
+          },
+          rotation: {
+            x: rotation.x,
+            y: rotation.y,
+            z: rotation.z
+          },
+          scale: {
+            x: scale.x,
+            y: scale.y,
+            z: scale.z
+          }
+        }
+      })
+    }
+  }
+
   public dispose() {
     this._keyFrames.length = 0
     this.onUpdate.dispose()
