@@ -192,7 +192,6 @@ window.addEventListener('keydown', ({ keyCode }: KeyboardEvent) => {
       break
 
     case Keys.D:
-      // console.log(JSON.stringify(keyFrame, null, 2))
       for (let bone of controllableBones) {
         console.log(JSON.stringify(bone.serialize()))
       }
@@ -217,32 +216,7 @@ const group = new THREE.Object3D()
 scene.add(group)
 
 let character: THREE.Mesh
-let floor: THREE.Mesh
-
 let skeletonHelper: THREE.SkeletonHelper
-
-let lightPosition = new THREE.Vector4()
-let lightColor = 'red'
-let floorPlane: THREE.Plane
-
-let characterShadow
-
-let light = new THREE.PointLight(0xffffff, 1);
-light.position.set(5, 7, -1);
-light.lookAt( new THREE.Vector3(0, 0, 0));
-scene.add(light);
-
-const ambientLight = new THREE.AmbientLight(0x404040);
-scene.add(ambientLight);
-
-function loadFloor() {
-  // loader.load(require<string>('./models/dummy-floor.json'), geometry => {
-  //   floor = new THREE.Mesh(geometry, material)
-  //   scene.add(floor)
-  // })
-
-  floorPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0.01)
-}
 
 function loadCharacter() {
   loader.load(require<string>('./models/richi.json'), geometry => {
@@ -256,7 +230,6 @@ function loadCharacter() {
 
     skeletonHelper = new THREE.SkeletonHelper(character)
     skeletonHelper.updateMatrix()
-    // scene.add(skeletonHelper);
 
     for (let bone of skeletonHelper.bones) {
       bone.updateMatrix()
@@ -272,30 +245,12 @@ function loadCharacter() {
     }
 
     hydrate(getAnimationFromCookies())
-
-    characterShadow = new ShadowMesh(character, 1)
-    scene.add(characterShadow)
   })
 }
 
-loadFloor()
 loadCharacter()
 
-// loader.load(require<string>('./models/dummy-sky-dome.json'), geometry => {
-//   // const skyDome = new THREE.Mesh(geometry, material)
-//   // scene.add(skyDome)
-// })
-
 scene.onUpdate.add(() => {
-  if (characterShadow) {
-    lightPosition.x = light.position.x
-    lightPosition.y = light.position.y
-    lightPosition.z = light.position.z
-    lightPosition.w = 0.01
-
-    characterShadow.update(floorPlane, lightPosition)
-  }
-
   if (skeletonHelper) {
     skeletonHelper.update()
   }
