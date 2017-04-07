@@ -51,6 +51,7 @@ export default class Scene {
     this._camera = new THREE.PerspectiveCamera(45, width / height, 1, 100)
 
     this._transformControls = new TransformControls(this._camera, this._$element)
+    this._transformControls.setSize(0.3)
     this._scene.add(this._transformControls)
     this._orbitControls = new OrbitControls(this._camera, this._$element)
 
